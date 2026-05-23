@@ -1,0 +1,50 @@
+import { Router } from 'express';
+import type { Request, Response } from 'express';
+import { generateDocumentsPdf, generateFormPdf } from '../services/pdfService';
+import { sendSubmissionEmail } from '../services/emailService';
+import type { SubmitRequest } from '../types';
+
+const router = Router();
+
+// POST /api/submit
+router.post('/submit', async (req: Request, res: Response) => {
+  const { submissionId, formData, documents } = req.body as SubmitRequest;
+
+  if (!submissionId || !formData || !Array.isArray(documents)) {
+    return res.status(400).json({ success: false, message: 'Invalid submission payload.' });
+  }
+
+  const submittedAt = new Date();
+
+  try {
+    // Generate both PDFs in parallel
+    const [documentsPdf, formPdf] = await Promise.all([
+      generateDocumentsPdf(documents),
+      generateFormPdf(formData, submissionId, submittedAt),
+    ]);
+
+    // Send email
+    await sendSubmissionEmail({ submissionId, formData, documentsPdf, formPdf, submittedAt });
+
+    // We deliberately do NOT store anything — PDFs are generated in-memory
+    // and passed directly to nodemailer without touching disk.
+
+    return res.json({
+      success: true,
+      message: 'Your documents have been successfully submitted.',
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[/submit] error:', err);
+
+    // Distinguish email errors from PDF errors
+    const isEmail = msg.toLowerCase().includes('smtp') || msg.toLowerCase().includes('econnrefused');
+    const userMsg = isEmail
+      ? 'We could not send the email to the agency. Please retry in a few moments.'
+      : 'An error occurred while preparing your submission. Please try again.';
+
+    return res.status(500).json({ success: false, message: userMsg });
+  }
+});
+
+export default router;

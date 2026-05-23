@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanan Immigration — Detailed Information Sheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy:      #1B3A6B;
+    --mid-blue:  #2E75B6;
+    --light-blue:#D5E8F0;
+    --red:       #C0392B;
+    --green:     #16a34a;
+    --amber:     #d97706;
+    --gray-100:  #f8f8f8;
+    --gray-200:  #e8e8e8;
+    --gray-300:  #cccccc;
+    --gray-700:  #404040;
+    --gray-900:  #1a1a1a;
+    --white:     #ffffff;
+    --border:    1px solid #aaaaaa;
+    --cell-pad:  4px 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--gray-900);
+    background: #f0f0f0;
+    padding: 20px;
+  }
+
+  /* ── Legend bar ───────────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 10px 18px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .legend-title { font-weight: 600; color: var(--navy); margin-right: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+  }
+  .dot-passport   { background: #dbeafe; border: 1px solid #3b82f6; }
+  .dot-national   { background: #ede9fe; border: 1px solid #7c3aed; }
+  .dot-employment { background: #dcfce7; border: 1px solid #16a34a; }
+  .dot-bank       { background: #fef9c3; border: 1px solid #ca8a04; }
+  .dot-birth      { background: #ffe4e6; border: 1px solid #e11d48; }
+  .dot-address    { background: #ffedd5; border: 1px solid #ea580c; }
+  .dot-manual     { background: #f1f5f9; border: 1px solid #64748b; }
+  .dot-multi      { background: linear-gradient(135deg,#dbeafe 50%,#ede9fe 50%); border: 1px solid #6366f1; }
+
+  /* ── Page wrapper ─────────────────────────────────────────────── */
+  .page {
+    background: var(--white);
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto 32px;
+    padding: 28px 32px;
+    border: 1px solid var(--gray-300);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .page-number {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    background: #e06c00;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    width: 22px; height: 22px;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .initials-box {
+    position: absolute;
+    bottom: 10px;
+    left: 14px;
+    border: 1px solid #888;
+    padding: 3px 16px;
+    font-size: 10px;
+    color: #666;
+    border-radius: 2px;
+  }
+
+  /* ── Form title ───────────────────────────────────────────────── */
+  .form-title {
+    font-family: 'Source Serif 4', serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--gray-900);
+    border-bottom: 2px solid var(--gray-900);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+
+  /* ── Section heading ──────────────────────────────────────────── */
+  .section-heading {
+    background: var(--navy);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 11px;
+    padding: 5px 8px;
+    letter-spacing: 0.3px;
+    margin: 14px 0 0;
+  }
+
+  /* ── Main table ───────────────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  td, th {
+    border: var(--border);
+    padding: var(--cell-pad);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .label {
+    font-weight: 600;
+    background: var(--gray-100);
+    white-space: nowrap;
+    font-size: 10.5px;
+    color: var(--gray-700);
+    min-width: 140px;
+  }
+  .value {
+    min-height: 22px;
+    position: relative;
+  }
+
+  /* ── Source badge ─────────────────────────────────────────────── */
+  .src {
+    display: inline-block;
+    font-size: 8.5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    padding: 1px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .src-passport   { background:#dbeafe; color:#1d4ed8; border:1px solid #93c5fd; }
+  .src-national   { background:#ede9fe; color:#6d28d9; border:1px solid #c4b5fd; }
+  .src-employment { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+  .src-bank       { background:#fef9c3; color:#92400e; border:1px solid #fde68a; }
+  .src-birth      { background:#ffe4e6; color:#be123c; border:1px solid #fda4af; }
+  .src-address    { background:#ffedd5; color:#c2410c; border:1px solid #fdba74; }
+  .src-manual     { background:#f1f5f9; color:#475569; border:1px solid #94a3b8; }
+  .src-multi      { background:#e0e7ff; color:#3730a3; border:1px solid #a5b4fc; }
+
+  /* ── Row with coloured bg based on primary source ────────────── */
+  .row-passport   td.value { background: #f0f7ff; }
+  .row-national   td.value { background: #f5f3ff; }
+  .row-employment td.value { background: #f0fdf4; }
+  .row-bank       td.value { background: #fefce8; }
+  .row-birth      td.value { background: #fff1f2; }
+  .row-address    td.value { background: #fff7ed; }
+  .row-manual     td.value { background: #f8fafc; }
+  .row-multi      td.value { background: #eef2ff; }
+
+  /* ── Input line ───────────────────────────────────────────────── */
+  .input-line {
+    display: block;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    outline: none;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 2px 0;
+    background: transparent;
+    min-height: 18px;
+  }
+
+  /* ── YES/NO checkboxes ────────────────────────────────────────── */
+  .yn-cell {
+    text-align: center;
+    vertical-align: middle;
+  }
+  .yn-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .yn-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .yn-label input[type=checkbox] {
+    width: 14px; height: 14px; cursor: pointer;
+  }
+
+  /* ── Complex tables (education, employment, address) ──────────── */
+  .complex-table th {
+    background: var(--gray-200);
+    font-weight: 600;
+    font-size: 10px;
+    text-align: center;
+    padding: 4px 3px;
+    color: var(--gray-700);
+  }
+  .complex-table td {
+    font-size: 10px;
+    min-height: 28px;
+    height: 36px;
+  }
+
+  /* ── Family table ─────────────────────────────────────────────── */
+  .family-table th {
+    background: var(--gray-200);
+    font-weight: 600;
+    font-size: 10px;
+    text-align: center;
+    padding: 5px 3px;
+    color: var(--gray-700);
+  }
+  .family-row-label {
+    font-weight: 600;
+    font-size: 10px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    padding: 4px 6px;
+  }
+  .family-cell {
+    font-size: 10px;
+    min-height: 26px;
+    height: 30px;
+    vertical-align: middle;
+  }
+
+  /* ── Accompanying row ─────────────────────────────────────────── */
+  .acc-cell {
+    text-align: center;
+    vertical-align: middle;
+  }
+  .acc-pair {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .acc-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 9px;
+  }
+  .acc-circle {
+    width: 16px; height: 16px;
+    border: 1px solid #666;
+    border-radius: 50%;
+  }
+
+  /* ── English test table ───────────────────────────────────────── */
+  .test-header {
+    background: var(--navy);
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* ── Page break label ─────────────────────────────────────────── */
+  .page-label {
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Source analysis section ──────────────────────────────────── */
+  .analysis {
+    background: var(--white);
+    max-width: 960px;
+    margin: 0 auto 32px;
+    border: 1px solid var(--gray-300);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .analysis-header {
+    background: var(--navy);
+    color: white;
+    padding: 14px 24px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .analysis-body { padding: 20px 24px; }
+  .analysis-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .analysis-table th {
+    background: var(--navy);
+    color: white;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 10.5px;
+  }
+  .analysis-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .analysis-table tr:nth-child(even) td { background: var(--gray-100); }
+  .analysis-table tr:hover td { background: #e8f0f8; }
+  .field-name { font-weight: 600; color: var(--navy); font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+  .source-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .note-text { color: #666; font-size: 10px; font-style: italic; }
+  .category-row td { background: var(--light-blue) !important; font-weight: 700; color: var(--navy); font-size: 11px; }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .legend, .analysis { display: none; }
+    .page { box-shadow: none; border: none; margin: 0; padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LEGEND ──────────────────────────────────────────────────────────── -->
+<div class="legend">
+  <span class="legend-title">Field Source Key:</span>
+  <div class="legend-item"><div class="legend-dot dot-passport"></div> Passport</div>
+  <div class="legend-item"><div class="legend-dot dot-national"></div> National ID</div>
+  <div class="legend-item"><div class="legend-dot dot-employment"></div> Employment Letter</div>
+  <div class="legend-item"><div class="legend-dot dot-bank"></div> Bank Statement</div>
+  <div class="legend-item"><div class="legend-dot dot-birth"></div> Birth Certificate</div>
+  <div class="legend-item"><div class="legend-dot dot-address"></div> Proof of Address</div>
+  <div class="legend-item"><div class="legend-dot dot-multi"></div> Multiple Documents</div>
+  <div class="legend-item"><div class="legend-dot dot-manual"></div> Manual Entry Only</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 1
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 1 of 7 —</div>
+<div class="page">
+  <div class="form-title">Detailed Information Sheet</div>
+
+  <table>
+    <!-- Row 1: Name -->
+    <tr class="row-multi">
+      <td class="label">Family Name / Surname</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+        <span class="src src-national">NAT.ID</span>
+        <span class="src src-birth">BIRTH CERT</span>
+      </td>
+      <td class="label">Given Names</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+        <span class="src src-national">NAT.ID</span>
+        <span class="src src-birth">BIRTH CERT</span>
+      </td>
+    </tr>
+    <!-- Row 2: Contact -->
+    <tr class="row-manual">
+      <td class="label">Telephone Number</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Email Address</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 3: Passport -->
+    <tr class="row-passport">
+      <td class="label">Passport Number</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+      </td>
+      <td class="label">Country of Issuance</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+      </td>
+    </tr>
+    <!-- Row 4: Passport dates -->
+    <tr class="row-passport">
+      <td class="label">Passport Issue Date</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+      </td>
+      <td class="label">Passport Expiry Date</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+      </td>
+    </tr>
+    <!-- Row 5: Residence / Birth -->
+    <tr class="row-multi">
+      <td class="label">Country of Residence<br><span style="font-weight:400;font-size:9px">(city and country)</span></td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-address">PROOF ADDR</span>
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Place of Birth<br><span style="font-weight:400;font-size:9px">(city and country)</span></td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+        <span class="src src-birth">BIRTH CERT</span>
+      </td>
+    </tr>
+    <!-- Row 6: Marital / Marriage -->
+    <tr class="row-manual">
+      <td class="label">Marital Status</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Date of Marriage</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 7: DOB / Citizenship -->
+    <tr class="row-multi">
+      <td class="label">Date of Birth</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+        <span class="src src-national">NAT.ID</span>
+        <span class="src src-birth">BIRTH CERT</span>
+      </td>
+      <td class="label">Citizenship</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-passport">PASSPORT</span>
+        <span class="src src-national">NAT.ID</span>
+      </td>
+    </tr>
+    <!-- Row 8: Physical -->
+    <tr class="row-manual">
+      <td class="label">Eye Color</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Height</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 9: Occupation / Status -->
+    <tr class="row-multi">
+      <td class="label">Current Occupation</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-employment">EMPLOY LETTER</span>
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Current Status in Canada</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 10: Language / Status expiry -->
+    <tr class="row-manual">
+      <td class="label">Native Language</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Current Status Expiry</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 11: Referral / Children -->
+    <tr class="row-manual">
+      <td class="label">Referred By</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Number of Children</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 12: Course dates -->
+    <tr class="row-manual">
+      <td class="label">Course Start Date</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="label">Course End Date</td>
+      <td class="value"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 13: Entry / UCI -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Initially Entered Canada as; Visitor / Refugee / Student / Worker.<br>Please Provide Your UCI Number</td>
+      <td class="value"><input class="input-line" type="text" placeholder="Entry category">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="value" style="text-align:center">
+        <div style="font-size:9px;color:#888;margin-bottom:2px;">****-****</div>
+        <input class="input-line" type="text" placeholder="UCI Number">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 14: Date first entered -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Date First Entered Canada and Port of Entry</td>
+      <td class="value" colspan="2"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 15: Deported -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Have you ever been Deported / Refused Visa / Refused Entry to any country</td>
+      <td class="yn-cell">
+        <div class="yn-wrap">
+          <div class="yn-label"><span>NO</span><input type="checkbox"></div>
+          <div class="yn-label"><span>YES</span><input type="checkbox"></div>
+        </div>
+        <span class="src src-manual">MANUAL</span>
+      </td>
+      <td class="value"><div style="font-weight:600;font-size:10px;margin-bottom:4px;">Provide Details</div>
+        <input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 16: IRCC -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Have You Applied to IRCC before in past</td>
+      <td class="yn-cell" colspan="2">
+        <div class="yn-wrap">
+          <div class="yn-label"><span>NO</span><input type="checkbox"></div>
+          <div class="yn-label"><span>YES</span><input type="checkbox"></div>
+        </div>
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 17: PNP -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Have You Applied to any PNP before in past</td>
+      <td class="yn-cell" colspan="2">
+        <div class="yn-wrap">
+          <div class="yn-label"><span>NO</span><input type="checkbox"></div>
+          <div class="yn-label"><span>YES</span><input type="checkbox"></div>
+        </div>
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 18: Relative -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Do you have any relative in Canada</td>
+      <td class="yn-cell" colspan="2">
+        <div class="yn-wrap">
+          <div class="yn-label"><span>NO</span><input type="checkbox"></div>
+          <div class="yn-label"><span>YES</span><input type="checkbox"></div>
+        </div>
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 19: Education level -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Highest Education Completed (Canadian Equivalency)</td>
+      <td class="value" colspan="2"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+    <!-- Row 20: Years of education -->
+    <tr class="row-manual">
+      <td class="label" colspan="2">Total Number of Years of Education including primary, secondary and post-secondary education</td>
+      <td class="value" colspan="2"><input class="input-line" type="text">
+        <span class="src src-manual">MANUAL</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Education table -->
+  <div class="section-heading">List all Educational Institutes attended, without leaving gap in time beginning with the most recent one. If you were unemployed / free during the period, please indicate.</div>
+  <table class="complex-table">
+    <thead>
+      <tr>
+        <th colspan="2">From</th>
+        <th colspan="2">To</th>
+        <th>Name of Educational Institution<br><span style="font-weight:400">(Start from elementary)</span></th>
+        <th>Number of Years /<br>Number of hrs./week</th>
+        <th>Field of Study</th>
+        <th>City and Country</th>
+        <th>Certificate, Diploma Awarded</th>
+      </tr>
+      <tr>
+        <th>Year</th><th>Month</th><th>Year</th><th>Month</th>
+        <th></th><th></th><th></th><th></th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 5 rows for education on page 1, continued on page 2 -->
+      <tr class="row-manual">
+        <td></td><td></td><td></td><td></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+      </tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-number">1</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 2 — Education continued + English Language Test
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 2 of 7 —</div>
+<div class="page">
+  <div class="section-heading">Educational Institutes — continued</div>
+  <table class="complex-table">
+    <thead>
+      <tr>
+        <th colspan="2">From</th><th colspan="2">To</th>
+        <th>Name of Educational Institution<br><span style="font-weight:400">(Start from elementary)</span></th>
+        <th>Number of Years / hrs./week</th>
+        <th>Field of Study</th>
+        <th>City and Country / Complete Address</th>
+        <th>Certificate, Diploma Awarded</th>
+      </tr>
+      <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <!-- English Language Test -->
+  <br>
+  <table>
+    <tr><td colspan="8" class="test-header">English Language Test</td></tr>
+    <tr>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Test</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Date of Test</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Date of Result</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Listening</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Reading</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Writing</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Speaking</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Overall Score</th>
+      <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Remarks</th>
+    </tr>
+    <tr class="row-manual">
+      <td style="font-weight:600;font-size:10px;text-align:center">IELTS<br><span class="src src-manual">MANUAL</span></td>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    <tr class="row-manual">
+      <td style="font-weight:600;font-size:10px;text-align:center">CELPIP<br><span class="src src-manual">MANUAL</span></td>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    <tr><td style="height:30px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="initials-box">Initials</div>
+  <div class="page-number">2</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 3 — Employment History
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 3 of 7 —</div>
+<div class="page">
+  <div class="section-heading">List all positions you have held during last 10 years without leaving gap in time beginning with the most recent one. If you were unemployed during the period, please indicate.</div>
+  <table class="complex-table">
+    <thead>
+      <tr>
+        <th colspan="2">From</th><th colspan="2">To</th>
+        <th>Name of Employer / Name of Manager</th>
+        <th>Number of Years / Number of hours/week</th>
+        <th>Position / Occupation / Title / NOC</th>
+        <th>City and Country / Complete Address</th>
+        <th>When you became qualified for this job</th>
+      </tr>
+      <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr class="row-employment">
+        <td style="height:44px"></td><td></td><td></td><td></td>
+        <td><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span><br><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span><br><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+      </tr>
+      <tr><td style="height:44px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:44px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:44px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:44px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="initials-box">Initials</div>
+  <div class="page-number">3</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 4 — Address History
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 4 of 7 —</div>
+<div class="page">
+  <div class="section-heading">List all addresses you have lived during last 10 years without leaving gap in time beginning with the most recent one. If you were unemployed during the period, please indicate.</div>
+  <table class="complex-table">
+    <thead>
+      <tr>
+        <th colspan="2">From</th><th colspan="2">To</th>
+        <th>Complete Address Including Postal Code</th>
+        <th>Number of Years / Number of hours/week</th>
+        <th>Owned / Rented / Shared</th>
+        <th>City and Country</th>
+        <th>Activity</th>
+      </tr>
+      <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr class="row-address">
+        <td style="height:40px"></td><td></td><td></td><td></td>
+        <td><span class="src src-address" style="font-size:8px">PROOF ADDR</span><br><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td><span class="src src-address" style="font-size:8px">PROOF ADDR</span></td>
+        <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+      </tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="initials-box">Initials</div>
+  <div class="page-number">4</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 5 — Details of Children and Spouse
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 5 of 7 —</div>
+<div class="page">
+  <div class="section-heading" style="text-align:center;font-size:12px;padding:8px">Details of Children and Spouse</div>
+  <table class="family-table">
+    <thead>
+      <tr>
+        <th style="min-width:130px"></th>
+        <th>Applicant</th>
+        <th>Spouse</th>
+        <th>Son / Daughter</th>
+        <th>Son / Daughter</th>
+        <th>Son / Daughter</th>
+        <th>Son / Daughter</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Each row: label + source badge on applicant column only -->
+      <tr>
+        <td class="family-row-label">Family Name / Surname</td>
+        <td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Given Names</td>
+        <td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Date of Birth</td>
+        <td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Place of Birth<br><span style="font-weight:400;font-size:9px">(city and country)</span></td>
+        <td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span><br><span class="src src-birth" style="font-size:8px">BIRTH CERT</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Country of Residence<br><span style="font-weight:400;font-size:9px">(city and country)</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Citizenship</td>
+        <td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Email Address /<br>Telephone Number</td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Marital Status</td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Date of Marriage<br><span style="font-weight:400;font-size:9px">(if applicable)</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Passport Number<br>and Country of Issuance</td>
+        <td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Address</td>
+        <td class="family-cell"><span class="src src-address" style="font-size:8px">PROOF ADDR</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Native Language</td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <tr>
+        <td class="family-row-label">Current Occupation</td>
+        <td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span><br><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td>
+      </tr>
+      <!-- Accompanying row -->
+      <tr>
+        <td class="family-row-label">Accompanying</td>
+        <td class="acc-cell">
+          <div class="acc-pair">
+            <div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div>
+            <div class="acc-item"><div class="acc-circle"></div><span>No</span></div>
+          </div>
+          <div style="font-size:8px;color:#888;text-align:center">N/A — Applicant</div>
+        </td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="initials-box">Initials</div>
+  <div class="page-number">5</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 6 — Details of Brothers and Sisters
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 6 of 7 —</div>
+<div class="page">
+  <div class="section-heading" style="text-align:center;font-size:12px;padding:8px">Details of Brothers and Sisters</div>
+  <table class="family-table">
+    <thead>
+      <tr>
+        <th style="min-width:130px"></th>
+        <th>Applicant</th>
+        <th>Brother / Sister</th>
+        <th>Brother / Sister</th>
+        <th>Brother / Sister</th>
+        <th>Brother / Sister</th>
+        <th>Brother / Sister</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="family-row-label">Family Name / Surname</td><td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Given Names</td><td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Date of Birth</td><td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Place of Birth<br><span style="font-weight:400;font-size:9px">(city and country)</span></td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span><br><span class="src src-birth" style="font-size:8px">BIRTH CERT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Country of Residence<br><span style="font-weight:400;font-size:9px">(city and country)</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Citizenship</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Email / Telephone</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Marital Status</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Address</td><td class="family-cell"><span class="src src-address" style="font-size:8px">PROOF ADDR</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Passport Number<br>and Country of Issuance</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Current Occupation</td><td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Native Language</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr>
+        <td class="family-row-label">Accompanying</td>
+        <td class="acc-cell"><div style="font-size:8px;color:#888">N/A</div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="initials-box">Initials</div>
+  <div class="page-number">6</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 7 — Details of Parents
+════════════════════════════════════════════════════════════════════════ -->
+<div class="page-label">— Page 7 of 7 —</div>
+<div class="page">
+  <div class="section-heading" style="text-align:center;font-size:12px;padding:8px">Details of Parents</div>
+  <table class="family-table">
+    <thead>
+      <tr>
+        <th style="min-width:130px"></th>
+        <th>Applicant</th>
+        <th>Father</th>
+        <th>Mother</th>
+        <th>Spouse</th>
+        <th>Father</th>
+        <th>Mother</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="family-row-label">Family Name / Surname</td><td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Given Names</td><td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Date of Birth</td><td class="family-cell"><span class="src src-multi" style="font-size:8px">PASS/ID/BIRTH</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Place of Birth<br><span style="font-weight:400;font-size:9px">(city and country)</span></td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span><br><span class="src src-birth" style="font-size:8px">BIRTH CERT</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Country of Residence<br><span style="font-weight:400;font-size:9px">(city and country)</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Citizenship</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Email / Telephone</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Marital Status</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Address</td><td class="family-cell"><span class="src src-address" style="font-size:8px">PROOF ADDR</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Passport Number<br>and Country of Issuance</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Current Occupation</td><td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr><td class="family-row-label">Native Language</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td><td class="family-cell"></td></tr>
+      <tr>
+        <td class="family-row-label">Accompanying</td>
+        <td class="acc-cell"><div style="font-size:8px;color:#888">N/A</div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+        <td class="acc-cell"><div class="acc-pair"><div class="acc-item"><div class="acc-circle"></div><span>Yes</span></div><div class="acc-item"><div class="acc-circle"></div><span>No</span></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Date of Entry -->
+  <br>
+  <table>
+    <tr class="row-manual">
+      <td class="label" style="width:220px">Date of Entry in Canada</td>
+      <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+    </tr>
+    <tr class="row-manual">
+      <td class="label">Date of Recent Entry in Canada</td>
+      <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+    </tr>
+  </table>
+
+  <div class="initials-box">Initials</div>
+  <div class="page-number">7</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     FIELD ANALYSIS TABLE
+════════════════════════════════════════════════════════════════════════ -->
+<div class="analysis">
+  <div class="analysis-header">Complete Field Analysis — Source Document Mapping</div>
+  <div class="analysis-body">
+    <table class="analysis-table">
+      <thead>
+        <tr>
+          <th style="width:22%">Field Name</th>
+          <th style="width:28%">Source Document(s)</th>
+          <th style="width:50%">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- PERSONAL DETAILS -->
+        <tr class="category-row"><td colspan="3">PERSONAL DETAILS — Page 1</td></tr>
+        <tr><td class="field-name">Family Name / Surname</td><td class="source-pills"><span class="src src-passport">PASSPORT</span> <span class="src src-national">NAT. ID</span> <span class="src src-birth">BIRTH CERT</span></td><td>Passport is primary — most reliable. Cross-validate with National ID and Birth Certificate for consistency.</td></tr>
+        <tr><td class="field-name">Given Names</td><td class="source-pills"><span class="src src-passport">PASSPORT</span> <span class="src src-national">NAT. ID</span> <span class="src src-birth">BIRTH CERT</span></td><td>Extract exactly as printed — do not reformat or translate.</td></tr>
+        <tr><td class="field-name">Telephone Number</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>No official document contains the applicant's personal phone number. Must be entered by applicant.</td></tr>
+        <tr><td class="field-name">Email Address</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>No official document contains personal email. Must be entered by applicant.</td></tr>
+        <tr><td class="field-name">Passport Number</td><td class="source-pills"><span class="src src-passport">PASSPORT</span></td><td>Unique to passport. High confidence extraction from MRZ line 1.</td></tr>
+        <tr><td class="field-name">Country of Issuance</td><td class="source-pills"><span class="src src-passport">PASSPORT</span></td><td>Found on passport data page and MRZ.</td></tr>
+        <tr><td class="field-name">Passport Issue Date</td><td class="source-pills"><span class="src src-passport">PASSPORT</span></td><td>Clearly printed on passport data page.</td></tr>
+        <tr><td class="field-name">Passport Expiry Date</td><td class="source-pills"><span class="src src-passport">PASSPORT</span></td><td>Critical field — high confidence threshold required. Also in MRZ line 2.</td></tr>
+        <tr><td class="field-name">Country of Residence</td><td class="source-pills"><span class="src src-address">PROOF OF ADDRESS</span> <span class="src src-manual">MANUAL</span></td><td>Proof of address provides current address/country. However applicant may currently reside abroad — verify manually.</td></tr>
+        <tr><td class="field-name">Place of Birth</td><td class="source-pills"><span class="src src-passport">PASSPORT</span> <span class="src src-birth">BIRTH CERT</span></td><td>Birth certificate is more reliable. Passport sometimes abbreviates city names.</td></tr>
+        <tr><td class="field-name">Marital Status</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>No standard document reliably states marital status. Some national IDs include it but inconsistently. Mark manual.</td></tr>
+        <tr><td class="field-name">Date of Marriage</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Would require marriage certificate — not in the standard document list. Manual entry.</td></tr>
+        <tr><td class="field-name">Date of Birth</td><td class="source-pills"><span class="src src-passport">PASSPORT</span> <span class="src src-national">NAT. ID</span> <span class="src src-birth">BIRTH CERT</span></td><td>Cross-validate across all three documents. Discrepancies are a red flag for the agent.</td></tr>
+        <tr><td class="field-name">Citizenship</td><td class="source-pills"><span class="src src-passport">PASSPORT</span> <span class="src src-national">NAT. ID</span></td><td>Passport nationality field is the most reliable source.</td></tr>
+        <tr><td class="field-name">Eye Color</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Appears on some national IDs and driving licences but not consistently. Mark manual — applicant fills.</td></tr>
+        <tr><td class="field-name">Height</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Appears on some national IDs and driving licences but not in the standard document list. Manual entry.</td></tr>
+        <tr><td class="field-name">Current Occupation</td><td class="source-pills"><span class="src src-employment">EMPLOYMENT LETTER</span> <span class="src src-manual">MANUAL</span></td><td>Employment letter provides job title and employer. If unemployed or self-employed, must be entered manually.</td></tr>
+        <tr><td class="field-name">Current Status in Canada</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Visitor / Student / Worker / PR / Citizen — no document in the standard list contains this. Manual entry.</td></tr>
+        <tr><td class="field-name">Native Language</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>No standard document contains native language. Manual entry by applicant.</td></tr>
+        <tr><td class="field-name">Current Status Expiry</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Would require the applicant's Canadian visa or permit document — not in the standard document list.</td></tr>
+        <tr><td class="field-name">Referred By</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Internal referral tracking — no document source. Manual entry.</td></tr>
+        <tr><td class="field-name">Number of Children</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>No standard document reliably states number of children. Manual entry.</td></tr>
+        <tr><td class="field-name">Course Start Date</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Would require a study permit or offer letter — not in the standard document list. Manual entry.</td></tr>
+        <tr><td class="field-name">Course End Date</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Same as above. Manual entry.</td></tr>
+        <tr><td class="field-name">Initially Entered Canada as</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Entry category (Visitor/Refugee/Student/Worker) — requires travel history knowledge. Manual entry.</td></tr>
+        <tr><td class="field-name">UCI Number</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Unique Client Identifier from IRCC. Not printed on passport. Applicant must know this from previous IRCC correspondence.</td></tr>
+        <tr><td class="field-name">Date First Entered Canada</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Passport may show entry stamps but extraction of specific stamps is unreliable. Manual entry.</td></tr>
+        <tr><td class="field-name">Port of Entry</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Same as above. Manual entry from memory or travel documents.</td></tr>
+        <tr><td class="field-name">Deported / Refused Visa / Entry</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Yes/No declaration. Personal knowledge only. Manual entry.</td></tr>
+        <tr><td class="field-name">Applied to IRCC before</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Yes/No declaration. No document source. Manual entry.</td></tr>
+        <tr><td class="field-name">Applied to any PNP before</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Yes/No declaration. No document source. Manual entry.</td></tr>
+        <tr><td class="field-name">Relative in Canada</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Yes/No declaration. Personal knowledge only. Manual entry.</td></tr>
+        <tr><td class="field-name">Highest Education Completed</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Canadian equivalency requires applicant self-assessment. Transcripts/diplomas could inform but are not in the standard document list.</td></tr>
+        <tr><td class="field-name">Total Years of Education</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Calculated from educational history. Manual entry.</td></tr>
+
+        <!-- EDUCATION HISTORY -->
+        <tr class="category-row"><td colspan="3">EDUCATION HISTORY — Pages 1 & 2</td></tr>
+        <tr><td class="field-name">Institution Name, Field, Dates, Qualification</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Would require educational certificates/transcripts/diplomas — not in the standard document list. Entire education history section is manual entry. Consider adding education documents to the required list.</td></tr>
+
+        <!-- ENGLISH LANGUAGE TEST -->
+        <tr class="category-row"><td colspan="3">ENGLISH LANGUAGE TEST — Page 2</td></tr>
+        <tr><td class="field-name">IELTS / CELPIP — all score fields</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Would require the official IELTS or CELPIP score report document. Not in the standard document list. Consider adding language test results as a required upload. All fields in this section are manual.</td></tr>
+
+        <!-- EMPLOYMENT HISTORY -->
+        <tr class="category-row"><td colspan="3">EMPLOYMENT HISTORY — Page 3</td></tr>
+        <tr><td class="field-name">Employer Name</td><td class="source-pills"><span class="src src-employment">EMPLOYMENT LETTER</span> <span class="src src-manual">MANUAL</span></td><td>Employment letter provides current employer. Past employers require manual entry.</td></tr>
+        <tr><td class="field-name">Manager Name</td><td class="source-pills"><span class="src src-employment">EMPLOYMENT LETTER</span> <span class="src src-manual">MANUAL</span></td><td>Sometimes on employment letter. Often manual.</td></tr>
+        <tr><td class="field-name">Position / NOC</td><td class="source-pills"><span class="src src-employment">EMPLOYMENT LETTER</span> <span class="src src-manual">MANUAL</span></td><td>Job title from employment letter. NOC code must be manually determined.</td></tr>
+        <tr><td class="field-name">Employment Dates</td><td class="source-pills"><span class="src src-employment">EMPLOYMENT LETTER</span> <span class="src src-manual">MANUAL</span></td><td>Start date from employment letter. End date for past jobs is manual.</td></tr>
+        <tr><td class="field-name">Employer Address</td><td class="source-pills"><span class="src src-employment">EMPLOYMENT LETTER</span></td><td>Usually on company letterhead of the employment letter.</td></tr>
+        <tr><td class="field-name">Hours/Week</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Sometimes in employment letter but often manual entry.</td></tr>
+        <tr><td class="field-name">When became qualified</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Personal knowledge. Manual entry.</td></tr>
+
+        <!-- ADDRESS HISTORY -->
+        <tr class="category-row"><td colspan="3">ADDRESS HISTORY — Page 4</td></tr>
+        <tr><td class="field-name">Current Address with Postal Code</td><td class="source-pills"><span class="src src-address">PROOF OF ADDRESS</span></td><td>Utility bill / bank letter / government correspondence provides current address clearly.</td></tr>
+        <tr><td class="field-name">City and Country</td><td class="source-pills"><span class="src src-address">PROOF OF ADDRESS</span></td><td>Extracted from proof of address document.</td></tr>
+        <tr><td class="field-name">Past Addresses (10 years)</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Only current address can be sourced from documents. All historical addresses are manual entry from memory.</td></tr>
+        <tr><td class="field-name">Owned / Rented / Shared</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>No document reliably states this. Manual entry.</td></tr>
+        <tr><td class="field-name">Activity during period</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Personal knowledge. Manual entry.</td></tr>
+
+        <!-- FAMILY DETAILS -->
+        <tr class="category-row"><td colspan="3">FAMILY DETAILS — Pages 5, 6, 7 (Spouse, Children, Siblings, Parents)</td></tr>
+        <tr><td class="field-name">Applicant details in family tables</td><td class="source-pills"><span class="src src-passport">PASSPORT</span> <span class="src src-national">NAT. ID</span> <span class="src src-birth">BIRTH CERT</span></td><td>Applicant's own columns can be auto-filled from documents already uploaded.</td></tr>
+        <tr><td class="field-name">Spouse — all fields</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Spouse's documents are not in the required upload list. All spouse fields are manual. Consider requiring spouse passport upload if applicable.</td></tr>
+        <tr><td class="field-name">Children — all fields</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Children's documents not in required list. All manual entry.</td></tr>
+        <tr><td class="field-name">Siblings — all fields</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Siblings' documents not in required list. All manual entry.</td></tr>
+        <tr><td class="field-name">Parents — all fields</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Parents' documents not in required list. All manual entry.</td></tr>
+        <tr><td class="field-name">Accompanying (Yes/No)</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>All accompanying declarations are manual Yes/No choices.</td></tr>
+
+        <!-- CANADA DATES -->
+        <tr class="category-row"><td colspan="3">CANADA ENTRY DATES — Page 7</td></tr>
+        <tr><td class="field-name">Date of Entry in Canada</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Requires passport entry stamp reading — unreliable for AI extraction. Manual entry.</td></tr>
+        <tr><td class="field-name">Date of Recent Entry in Canada</td><td class="source-pills"><span class="src src-manual">MANUAL ONLY</span></td><td>Same as above. Manual entry.</td></tr>
+
+      </tbody>
+    </table>
+
+    <!-- Summary -->
+    <div style="margin-top:24px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:10px;font-family:'Source Serif 4',serif;">Summary — What AI Can and Cannot Fill</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:11px;">
+        <div>
+          <div style="font-weight:600;color:#15803d;margin-bottom:6px;">✓ Fields AI can pre-fill from documents</div>
+          <div style="line-height:2;">
+            Surname, Given Names, Date of Birth, Place of Birth, Citizenship, Nationality<br>
+            Passport Number, Issue Date, Expiry Date, Country of Issuance, MRZ Lines<br>
+            Current Address, City, State, Postal Code (from Proof of Address)<br>
+            Employer Name, Job Title, Employment Start Date (from Employment Letter)<br>
+            Employer Address (from Employment Letter letterhead)<br>
+            National ID Number (from National ID card)
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:#be123c;margin-bottom:6px;">✗ Fields that must always be entered manually</div>
+          <div style="line-height:2;">
+            Phone Number, Email Address, Eye Color, Height<br>
+            Marital Status, Date of Marriage, Native Language<br>
+            Number of Children, UCI Number, Current Status in Canada<br>
+            All Yes/No declarations (IRCC, PNP, deportation, relatives)<br>
+            Entire Education History (no education docs in required list)<br>
+            English Test Scores (no test report in required list)<br>
+            All past employment beyond current job<br>
+            All past addresses beyond current address<br>
+            All family member details (spouse, children, siblings, parents)<br>
+            Course dates, referral source, Canada entry dates
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:#fff8e1;border-left:3px solid #f59e0b;border-radius:3px;font-size:10.5px;color:#78350f;">
+        <strong>Recommendation for Tanan Immigration:</strong> Consider adding the following documents to the required upload list to increase auto-fill coverage significantly: <strong>Educational Certificates / Transcripts</strong> (fills education history), <strong>IELTS / CELPIP Score Report</strong> (fills language test section), <strong>Spouse's Passport</strong> (fills spouse columns in family tables), <strong>Marriage Certificate</strong> (fills marital status and date of marriage). Adding these 4 document types would increase AI-fillable fields from approximately 25% to approximately 55% of the total form.
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
