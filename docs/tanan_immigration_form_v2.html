@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanan Immigration — Detailed Information Sheet v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root {
+    --navy:#1B3A6B;--mid-blue:#2E75B6;--light-blue:#D5E8F0;
+    --gray-100:#f8f8f8;--gray-200:#e8e8e8;--gray-300:#cccccc;
+    --gray-700:#404040;--gray-900:#1a1a1a;--white:#ffffff;
+    --border:1px solid #aaaaaa;--cell-pad:4px 6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--gray-900);background:#f0f0f0;padding:20px;}
+
+  /* Legend */
+  .legend{display:flex;gap:20px;align-items:center;background:var(--white);border:1px solid var(--gray-300);border-radius:6px;padding:10px 18px;margin-bottom:16px;flex-wrap:wrap;font-size:11px;}
+  .legend-title{font-weight:700;color:var(--navy);margin-right:6px;}
+  .legend-item{display:flex;align-items:center;gap:6px;}
+  .legend-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+  .dot-passport{background:#dbeafe;border:1px solid #3b82f6;}
+  .dot-traveler{background:#fef3c7;border:1px solid #d97706;}
+  .dot-employment{background:#dcfce7;border:1px solid #16a34a;}
+  .dot-marriage{background:#fdf4ff;border:1px solid #d8b4fe;}
+  .dot-address{background:#fff7ed;border:1px solid #fdba74;}
+  .dot-funds{background:#fefce8;border:2px dashed #fde047;}
+  .dot-upload{background:#f0fdf4;border:2px dashed #86efac;}
+  .dot-degree{background:#fce7f3;border:1px solid #db2777;}
+  .dot-ielts{background:#ede9fe;border:1px solid #7c3aed;}
+  .dot-celpip{background:#e0f2fe;border:1px solid #0284c7;}
+  .dot-proof{background:#f3f4f6;border:2px dashed #9ca3af;}
+  .dot-manual{background:#f1f5f9;border:1px solid #64748b;}
+
+  /* Page */
+  .page-label{font-size:10px;color:#888;text-align:center;margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+  .page{background:var(--white);width:100%;max-width:980px;margin:0 auto 32px;padding:28px 32px;border:1px solid var(--gray-300);box-shadow:0 2px 12px rgba(0,0,0,0.08);position:relative;}
+  .page-number{position:absolute;bottom:10px;right:14px;background:#e06c00;color:white;font-size:10px;font-weight:600;width:22px;height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;}
+  .initials-box{position:absolute;bottom:10px;left:14px;border:1px solid #888;padding:3px 16px;font-size:10px;color:#666;border-radius:2px;}
+  .form-title{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;letter-spacing:0.5px;color:var(--gray-900);border-bottom:2px solid var(--gray-900);padding-bottom:6px;margin-bottom:14px;text-transform:uppercase;}
+  .section-heading{background:var(--navy);color:var(--white);font-weight:600;font-size:11px;padding:5px 8px;letter-spacing:0.3px;margin:14px 0 0;}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;}
+  td,th{border:var(--border);padding:var(--cell-pad);vertical-align:top;line-height:1.4;}
+  .label{font-weight:600;background:var(--gray-100);white-space:nowrap;font-size:10.5px;color:var(--gray-700);min-width:140px;}
+  .value{min-height:22px;position:relative;}
+  .input-line{display:block;width:100%;border:none;border-bottom:1px solid #ccc;outline:none;font-size:11px;font-family:'DM Sans',sans-serif;padding:2px 0;background:transparent;min-height:18px;}
+
+  /* Source badges */
+  .src{display:inline-block;font-size:8.5px;font-family:'JetBrains Mono',monospace;font-weight:500;padding:1px 5px;border-radius:2px;letter-spacing:0.2px;white-space:nowrap;vertical-align:middle;margin-left:4px;}
+  .src-passport{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;}
+  .src-traveler{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+  .src-proof{background:#f3f4f6;color:#6b7280;border:2px dashed #9ca3af;font-style:italic;}
+  .src-employment{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
+  .src-marriage{background:#fdf4ff;color:#7e22ce;border:1px solid #d8b4fe;}
+  .src-address{background:#fff7ed;color:#c2410c;border:1px solid #fdba74;}
+  .src-funds{background:#fefce8;color:#854d0e;border:2px dashed #fde047;font-style:italic;}
+  .src-upload{background:#f0fdf4;color:#166534;border:2px dashed #86efac;font-style:italic;}
+  .src-degree{background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4;}
+  .src-ielts{background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;}
+  .src-celpip{background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;}
+  .src-manual{background:#f1f5f9;color:#475569;border:1px solid #94a3b8;}
+
+  /* Row tints */
+  .row-passport td.value{background:#f0f7ff;}
+  .row-traveler td.value{background:#fffbeb;}
+  .row-employment td.value{background:#f0fdf4;}
+  .row-marriage td.value{background:#fdf4ff;}
+  .row-address td.value{background:#fff7ed;}
+  .row-degree td.value{background:#fdf2f8;}
+  .row-ielts td.value{background:#f5f3ff;}
+  .row-celpip td.value{background:#f0f9ff;}
+  .row-manual td.value{background:#f8fafc;}
+
+  /* Yes/No */
+  .yn-cell{text-align:center;vertical-align:middle;}
+  .yn-wrap{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .yn-label{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:600;}
+  .yn-label input[type=checkbox]{width:14px;height:14px;cursor:pointer;}
+
+  /* Complex tables */
+  .complex-table th{background:var(--gray-200);font-weight:600;font-size:10px;text-align:center;padding:4px 3px;color:var(--gray-700);}
+  .complex-table td{font-size:10px;min-height:28px;height:40px;}
+
+  /* Family tables */
+  .family-table th{background:var(--gray-200);font-weight:600;font-size:10px;text-align:center;padding:5px 3px;color:var(--gray-700);}
+  .family-row-label{font-weight:600;font-size:10px;background:var(--gray-100);color:var(--gray-700);padding:4px 6px;}
+  .family-cell{font-size:10px;min-height:26px;height:30px;vertical-align:middle;}
+  .acc-cell{text-align:center;vertical-align:middle;}
+  .acc-pair{display:flex;gap:8px;justify-content:center;}
+  .acc-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;}
+  .acc-circle{width:16px;height:16px;border:1px solid #666;border-radius:50%;}
+  .test-header{background:var(--navy);color:white;text-align:center;font-weight:700;font-size:13px;padding:6px;letter-spacing:1px;}
+
+  /* Analysis */
+  .analysis{background:var(--white);max-width:980px;margin:0 auto 32px;border:1px solid var(--gray-300);box-shadow:0 2px 12px rgba(0,0,0,0.08);overflow:hidden;}
+  .analysis-header{background:var(--navy);color:white;padding:14px 24px;font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;}
+  .analysis-body{padding:20px 24px;}
+  .analysis-table{width:100%;border-collapse:collapse;font-size:11px;}
+  .analysis-table th{background:var(--navy);color:white;padding:8px 10px;text-align:left;font-weight:500;font-size:10.5px;}
+  .analysis-table td{padding:7px 10px;border-bottom:1px solid var(--gray-200);vertical-align:top;line-height:1.5;}
+  .analysis-table tr:nth-child(even) td{background:var(--gray-100);}
+  .field-name{font-weight:600;color:var(--navy);font-family:'JetBrains Mono',monospace;font-size:10px;}
+  .source-pills{display:flex;flex-wrap:wrap;gap:4px;}
+  .category-row td{background:var(--light-blue)!important;font-weight:700;color:var(--navy);font-size:11px;}
+
+  /* Updated document list callout */
+  .doc-list{background:var(--white);max-width:980px;margin:0 auto 24px;border:2px solid var(--navy);border-radius:6px;overflow:hidden;}
+  .doc-list-header{background:var(--navy);color:white;padding:10px 20px;font-weight:700;font-size:13px;font-family:'Source Serif 4',serif;}
+  .doc-list-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;}
+  .doc-item{display:flex;align-items:center;gap:8px;font-size:11px;padding:4px 0;border-bottom:1px solid #eee;}
+  .doc-num{background:var(--navy);color:white;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+
+
+  /* ── Traveler declaration panel ─────────────────────────────────── */
+  .traveler-panel{background:var(--white);max-width:980px;margin:0 auto 24px;border:2px solid #d97706;border-radius:6px;overflow:hidden;}
+  .traveler-panel-header{background:#d97706;color:white;padding:10px 20px;font-weight:700;font-size:13px;font-family:'Source Serif 4',serif;display:flex;align-items:center;gap:10px;}
+  .traveler-panel-body{padding:16px 20px;}
+  .traveler-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px;}
+  .traveler-card{border:1.5px solid #e5e7eb;border-radius:6px;padding:12px 14px;cursor:pointer;transition:all 0.15s;}
+  .traveler-card:hover{border-color:#d97706;background:#fffbeb;}
+  .traveler-card.selected{border-color:#d97706;background:#fffbeb;box-shadow:0 0 0 2px #fcd34d;}
+  .traveler-card-title{font-weight:600;font-size:11px;color:var(--navy);margin-bottom:4px;}
+  .traveler-card-sub{font-size:10px;color:#666;}
+  .traveler-card-check{float:right;color:#d97706;font-size:14px;}
+  .hard-stop{background:#fee2e2;border:1.5px solid #fca5a5;border-radius:4px;padding:8px 12px;font-size:10.5px;color:#991b1b;margin-top:10px;display:flex;align-items:center;gap:8px;}
+  .proof-note{background:#f9fafb;border:1.5px dashed #9ca3af;border-radius:4px;padding:8px 12px;font-size:10.5px;color:#6b7280;margin-top:8px;display:flex;align-items:center;gap:8px;}
+
+  /* ── Per-traveler upload section ─────────────────────────────────── */
+  .traveler-upload-section{background:var(--white);max-width:980px;margin:0 auto 20px;border:1.5px solid #d97706;border-radius:6px;overflow:hidden;}
+  .traveler-upload-header{background:#fffbeb;border-bottom:1px solid #fcd34d;padding:10px 18px;display:flex;align-items:center;gap:10px;}
+  .traveler-upload-title{font-weight:700;font-size:12px;color:#92400e;}
+  .traveler-upload-body{padding:14px 18px;}
+  .doc-upload-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #f3f4f6;}
+  .doc-upload-row:last-child{border-bottom:none;}
+  .doc-upload-label{font-weight:600;font-size:11px;color:var(--navy);min-width:180px;}
+  .doc-upload-status{font-size:10px;color:#666;}
+  .doc-required-badge{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;}
+  .doc-optional-badge{background:#f9fafb;color:#6b7280;border:1.5px dashed #9ca3af;font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;}
+  .doc-proof-badge{background:#f3f4f6;color:#6b7280;border:1.5px dashed #9ca3af;font-size:9px;padding:2px 6px;border-radius:3px;font-style:italic;}
+
+  /* ── Family column header with traveler label ───────────────────── */
+  .col-traveler{background:#fffbeb!important;color:#92400e!important;}
+  .col-applicant{background:#dbeafe!important;color:#1d4ed8!important;}
+
+  @media print{body{background:white;padding:0;}.legend,.analysis,.doc-list{display:none;}.page{box-shadow:none;border:none;margin:0;padding:20px;}}
+</style>
+</head>
+<body>
+
+<!-- LEGEND -->
+<div class="legend">
+  <span class="legend-title">Field Source (Confirmed by Tanan Immigration):</span>
+  <div class="legend-item"><div class="legend-dot dot-passport"></div> Passport</div>
+  <div class="legend-item"><div class="legend-dot dot-traveler"></div> Traveler Passport</div>
+  <div class="legend-item"><div class="legend-dot dot-marriage"></div> Marriage Certificate</div>
+  <div class="legend-item"><div class="legend-dot dot-address"></div> Aadhar Card / Driving Licence / Passport / Rent Agreement</div>
+  <div class="legend-item"><div class="legend-dot dot-employment"></div> Work Experience Certificate</div>
+  <div class="legend-item"><div class="legend-dot dot-degree"></div> Degree Certificate</div>
+  <div class="legend-item"><div class="legend-dot dot-ielts"></div> IELTS Score Sheet</div>
+  <div class="legend-item"><div class="legend-dot dot-celpip"></div> CELPIP Score Sheet</div>
+  <div class="legend-item"><div class="legend-dot dot-funds"></div> Proof of Funds (no extraction)</div>
+  <div class="legend-item"><div class="legend-dot dot-upload"></div> Upload Only (no extraction)</div>
+  <div class="legend-item"><div class="legend-dot dot-proof"></div> Proof Document (no extraction)</div>
+  <div class="legend-item"><div class="legend-dot dot-manual"></div> Manual Entry Only</div>
+</div>
+
+<!-- CONFIRMED DOCUMENT LIST -->
+<div class="doc-list">
+  <div class="doc-list-header">Confirmed Required Document List — Tanan Immigration (Updated)</div>
+  <div class="doc-list-body">
+    <div style="grid-column:1/-1;font-weight:700;font-size:11px;color:var(--navy);padding:4px 0 2px;border-bottom:1px solid #ddd;margin-bottom:4px;">DATA EXTRACTION DOCUMENTS</div>
+    <div class="doc-item"><div class="doc-num">1</div><span><strong>Passport</strong> — applicant. Extracts: First Name, Last Name, Passport No., DOB, City of Birth, Country of Birth, Issue Date, Expiry Date. <strong>Required. Hard stop.</strong></span></div>
+    <div class="doc-item"><div class="doc-num">2</div><span><strong>Marriage Certificate</strong> — extracts Date of Marriage. Upload only if married.</span></div>
+    <div class="doc-item"><div class="doc-num">3</div><span><strong>Aadhar Card / Driving Licence / Passport / Rent Agreement</strong> — user uploads one. Extracts: Address. Used as proof of address + address data source.</span></div>
+    <div class="doc-item"><div class="doc-num">4</div><span><strong>Work Experience Certificates</strong> — all employers, most recent first. Extracts per certificate: Job Start/End Date, Job Title, Salary, Job Type (Full/Part Time), Responsibilities. System orders by date, detects gaps.</span></div>
+    <div class="doc-item"><div class="doc-num">5</div><span><strong>Educational Degree Certificates</strong> — all degrees, most recent first. Extracts: Start/End Date, Institution, hrs/week, Field of Study, City/Country, Certificate Awarded.</span></div>
+    <div class="doc-item"><div class="doc-num">6</div><span><strong>IELTS Score Sheet</strong> — extracts all band scores and dates. Upload if applicable.</span></div>
+    <div class="doc-item"><div class="doc-num">7</div><span><strong>CELPIP Score Sheet</strong> — extracts all scores and dates. Upload if applicable.</span></div>
+    <div style="grid-column:1/-1;font-weight:700;font-size:11px;color:#d97706;padding:8px 0 2px;border-bottom:1px solid #fcd34d;margin-bottom:4px;">TRAVELER DOCUMENTS (per declared accompanying traveler)</div>
+    <div class="doc-item" style="background:#fffbeb;border-color:#fcd34d"><div class="doc-num" style="background:#d97706">T</div><span><strong>Spouse Passport</strong> — required if spouse declared. <strong>Hard stop.</strong> Extracts all identity fields for spouse column.</span></div>
+    <div class="doc-item" style="background:#fffbeb;border-color:#fcd34d"><div class="doc-num" style="background:#d97706">T</div><span><strong>Child Passport(s)</strong> — one per child declared. <strong>Hard stop per child.</strong> Extracts all identity fields for that child's column.</span></div>
+    <div style="grid-column:1/-1;font-weight:700;font-size:11px;color:#92400e;padding:8px 0 2px;border-bottom:1px solid #fdba74;margin-bottom:4px;">PROOF OF FUNDS — Upload only. No data extracted. Stored as attachments.</div>
+    <div class="doc-item" style="background:#fefce8;border:1px dashed #fde047"><div class="doc-num" style="background:#ca8a04">F</div><span><strong>6 Monthly Bank Statement</strong> — proof of funds</span></div>
+    <div class="doc-item" style="background:#fefce8;border:1px dashed #fde047"><div class="doc-num" style="background:#ca8a04">F</div><span><strong>Last 3 Salary Slips</strong> — proof of funds</span></div>
+    <div class="doc-item" style="background:#fefce8;border:1px dashed #fde047"><div class="doc-num" style="background:#ca8a04">F</div><span><strong>Tax Return Receipt</strong> — proof of funds</span></div>
+    <div class="doc-item" style="background:#fefce8;border:1px dashed #fde047"><div class="doc-num" style="background:#ca8a04">F</div><span><strong>Net Worth Statement</strong> — proof of funds</span></div>
+    <div class="doc-item" style="background:#fefce8;border:1px dashed #fde047"><div class="doc-num" style="background:#ca8a04">F</div><span><strong>Property Ownership Document</strong> — proof of funds</span></div>
+    <div style="grid-column:1/-1;font-weight:700;font-size:11px;color:#166534;padding:8px 0 2px;border-bottom:1px solid #86efac;margin-bottom:4px;">UPLOAD ONLY — No data extracted. Stored as attachments.</div>
+    <div class="doc-item" style="background:#f0fdf4;border:1px dashed #86efac"><div class="doc-num" style="background:#16a34a">U</div><span><strong>Birth Certificate</strong> — proof of birth only</span></div>
+    <div class="doc-item" style="background:#f0fdf4;border:1px dashed #86efac"><div class="doc-num" style="background:#16a34a">U</div><span><strong>Event Invitation Letter</strong> — upload only</span></div>
+    <div class="doc-item" style="background:#f0fdf4;border:1px dashed #86efac"><div class="doc-num" style="background:#16a34a">U</div><span><strong>Travel Tickets</strong> — upload only</span></div>
+    <div class="doc-item" style="background:#f0fdf4;border:1px dashed #86efac"><div class="doc-num" style="background:#16a34a">U</div><span><strong>Digital Picture</strong> — upload only</span></div>
+  </div>
+</div>
+
+
+<!-- TRAVELER DECLARATION PANEL -->
+<div class="traveler-panel">
+  <div class="traveler-panel-header">
+    <span>👥</span>
+    <span>Step 1 — Declare Accompanying Travelers</span>
+  </div>
+  <div class="traveler-panel-body">
+    <div style="font-size:11px;color:#444;margin-bottom:10px;">
+      Select everyone who will be accompanying the applicant. A <strong>passport upload slot</strong> will be created for each traveler you declare. 
+      Passport is <strong>mandatory</strong> for every traveler — the form cannot be submitted without it.
+    </div>
+    <div class="traveler-grid">
+      <div class="traveler-card selected">
+        <span class="traveler-card-check">✓</span>
+        <div class="traveler-card-title">Applicant</div>
+        <div class="traveler-card-sub">Always included</div>
+      </div>
+      <div class="traveler-card">
+        <div class="traveler-card-title">+ Spouse / Partner</div>
+        <div class="traveler-card-sub">Click to add</div>
+      </div>
+      <div class="traveler-card">
+        <div class="traveler-card-title">+ Child 1</div>
+        <div class="traveler-card-sub">Click to add</div>
+      </div>
+      <div class="traveler-card">
+        <div class="traveler-card-title">+ Child 2</div>
+        <div class="traveler-card-sub">Click to add</div>
+      </div>
+      <div class="traveler-card">
+        <div class="traveler-card-title">+ Child 3</div>
+        <div class="traveler-card-sub">Click to add</div>
+      </div>
+      <div class="traveler-card">
+        <div class="traveler-card-title">+ Child 4</div>
+        <div class="traveler-card-sub">Click to add</div>
+      </div>
+    </div>
+    <div class="hard-stop">
+      <span style="font-size:16px">🛑</span>
+      <span><strong>Hard Stop:</strong> A valid passport must be uploaded for every declared traveler. The form cannot proceed to submission without it. There are no exceptions.</span>
+    </div>
+    <div class="proof-note">
+      <span style="font-size:14px">📄</span>
+      <span><strong>Birth Certificate (optional):</strong> You may upload a birth certificate for any traveler as supporting proof. However, <strong>no data will be extracted from it</strong>. All personal information is read exclusively from the traveler's passport.</span>
+    </div>
+  </div>
+</div>
+
+<!-- PER-TRAVELER DOCUMENT UPLOAD — shown dynamically per declared traveler -->
+<div style="max-width:980px;margin:0 auto 8px;font-size:11px;font-weight:600;color:var(--navy);padding-left:4px;">Document Upload — Per Traveler</div>
+
+<section id="traveler-upload">
+	<!-- Applicant upload section -->
+	<div class="traveler-upload-section">
+	  <div class="traveler-upload-header">
+		<span style="background:#1B3A6B;color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">A</span>
+		<div class="traveler-upload-title">Applicant — Document Uploads</div>
+	  </div>
+	  <div class="traveler-upload-body">
+		<div style="font-size:10px;font-weight:700;color:var(--navy);padding:4px 0;border-bottom:1px solid #eee;margin-bottom:6px;">DATA EXTRACTION DOCUMENTS</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Passport <span class="doc-required-badge">REQUIRED — HARD STOP</span></div>
+		  <div class="doc-upload-status">Extracts: First Name, Last Name, Passport No., DOB, City of Birth, Country of Birth, Issue Date, Expiry Date</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Marriage Certificate <span class="doc-optional-badge">IF MARRIED</span></div>
+		  <div class="doc-upload-status">Extracts: Date of Marriage — fills the Date of Marriage field in the form</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Address Proof — Aadhar Card / Driving Licence / Passport / Rent Agreement <span class="doc-required-badge">REQUIRED — ONE OF THESE</span></div>
+		  <div class="doc-upload-status">Single scan button labelled "Address Proof". Upload any one document. System extracts the address field at runtime and fills the address in the form.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Work Experience Certificates <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status">Upload one per employer, all jobs. Extracts: Job Start/End Date, Title, Salary, Job Type, Responsibilities. Ordered by date, gaps detected.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Degree Certificates <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status">Upload all degrees. Extracts: Start/End Date, Institution, Field of Study, City/Country, Qualification. Most recent first.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">IELTS Score Sheet <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status">Extracts all band scores and test dates</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">CELPIP Score Sheet <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status">Extracts all scores and test dates</div>
+		</div>
+		<div style="font-size:10px;font-weight:700;color:#ca8a04;padding:8px 0 4px;border-bottom:1px solid #fde047;margin-bottom:6px;">PROOF OF FUNDS — Upload only. No data extracted.</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">6 Monthly Bank Statement <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as proof of funds attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Last 3 Salary Slips <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as proof of funds attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Tax Return Receipt <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as proof of funds attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Net Worth Statement <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as proof of funds attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Property Ownership Document <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as proof of funds attachment. No data extracted.</div>
+		</div>
+		<div style="font-size:10px;font-weight:700;color:#166534;padding:8px 0 4px;border-bottom:1px solid #86efac;margin-bottom:6px;">UPLOAD ONLY — No data extracted. Stored as attachments.</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Birth Certificate <span class="doc-proof-badge">PROOF OF BIRTH</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as proof of birth. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Event Invitation Letter <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Travel Tickets <span class="doc-optional-badge">IF APPLICABLE</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Digital Picture <span class="doc-optional-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+		</div>
+	  </div>
+	</div>
+
+	<!-- Spouse upload section (shown when spouse is declared) -->
+	<div class="traveler-upload-section">
+	  <div class="traveler-upload-header">
+		<span style="background:#d97706;color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">S</span>
+		<div class="traveler-upload-title">Spouse / Partner — Document Uploads</div>
+		<span style="margin-left:auto;font-size:10px;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:3px;border:1px solid #fcd34d">Accompanying Traveler</span>
+	  </div>
+	  <div class="traveler-upload-body">
+		<div style="font-size:10px;font-weight:700;color:var(--navy);padding:4px 0;border-bottom:1px solid #eee;margin-bottom:6px;">DATA EXTRACTION DOCUMENTS</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Passport <span class="doc-required-badge">REQUIRED — HARD STOP</span></div>
+		  <div class="doc-upload-status">All spouse data (name, DOB, place of birth, citizenship, passport number) extracted from this document only</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Work Experience Certificates <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status">Upload one per employer. Extracts: Job Start/End Date, Title, Salary, Job Type, Responsibilities. Ordered by date, gaps detected.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Degree Certificates <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status">Upload all degrees. Extracts: Start/End Date, Institution, Field of Study, City/Country, Qualification. Most recent first.</div>
+		</div>
+		<div style="font-size:10px;font-weight:700;color:#166534;padding:8px 0 4px;border-bottom:1px solid #86efac;margin-bottom:6px;">UPLOAD ONLY — No data extracted. Stored as attachments.</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Event Invitation Letter <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Travel Tickets <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+		</div>
+		<div class="doc-upload-row">
+		  <div class="doc-upload-label">Digital Picture <span class="doc-required-badge">REQUIRED</span></div>
+		  <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+		</div>
+	  </div>
+	</div>
+
+	<!-- Child 1 upload section (shown when Child 1 is declared) -->
+	<div class="traveler-upload-section">
+  <div class="traveler-upload-header">
+    <span style="background:#d97706;color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">C1</span>
+    <div class="traveler-upload-title">Child 1 — Document Uploads</div>
+    <span style="margin-left:auto;font-size:10px;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:3px;border:1px solid #fcd34d">Accompanying Traveler</span>
+  </div>
+  <div class="traveler-upload-body">
+    <div style="font-size:10px;font-weight:700;color:var(--navy);padding:4px 0;border-bottom:1px solid #eee;margin-bottom:6px;">DATA EXTRACTION DOCUMENTS</div>
+    <div class="doc-upload-row">
+      <div class="doc-upload-label">Passport <span class="doc-required-badge">REQUIRED — HARD STOP</span></div>
+      <div class="doc-upload-status">All child data extracted from this document only. Same extraction as adult passport.</div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#166634;padding:8px 0 4px;border-bottom:1px solid #86efac;margin-bottom:6px;">UPLOAD ONLY — No data extracted. Stored as attachments.</div>
+    <div class="doc-upload-row">
+      <div class="doc-upload-label">Travel Tickets <span class="doc-required-badge">REQUIRED</span></div>
+      <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+    </div>
+    <div class="doc-upload-row">
+      <div class="doc-upload-label">Digital Picture <span class="doc-required-badge">REQUIRED</span></div>
+      <div class="doc-upload-status" style="color:#9ca3af;font-style:italic">Stored as attachment. No data extracted.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div style="max-width:980px;margin:0 auto 16px;font-size:10px;color:#666;padding-left:4px;font-style:italic;">
+  Child 2, Child 3, Child 4 upload sections appear identically when declared above. Pattern repeats per traveler.
+</div>
+
+<section id="document-container">
+
+	<!-- PAGE 1 -->
+	<div class="page-label">— Page 1 of 7 —</div>
+	<div class="page">
+	  <div class="form-title">Detailed Information Sheet</div>
+	  <table>
+		<tr class="row-passport">
+		  <td class="label">Family Name / Surname</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		  <td class="label">Given Names</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label">Telephone Number</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		  <td class="label">Email Address</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-passport">
+		  <td class="label">Passport Number</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		  <td class="label">Country of Issuance</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		</tr>
+		<tr class="row-passport">
+		  <td class="label">Passport Issue Date</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		  <td class="label">Passport Expiry Date</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		</tr>
+		<tr class="row-address">
+		  <td class="label">Current Address<br><span style="font-weight:400;font-size:9px">(from Aadhar Card / Driving Licence / Passport / Rent Agreement)</span></td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-address">ADDR PROOF</span></td>
+		  <td class="label">Country of Residence<br><span style="font-weight:400;font-size:9px">(city and country)</span></td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-passport">
+		  <td class="label">City of Birth</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		  <td class="label">Country of Birth</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		</tr>
+		<tr>
+		  <td class="label row-manual" style="background:var(--gray-100)">Marital Status</td>
+		  <td class="value row-manual" style="background:#f8fafc"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		  <td class="label row-marriage" style="background:var(--gray-100)">Date of Marriage</td>
+		  <td class="value row-marriage" style="background:#fdf4ff"><input class="input-line" type="text"><span class="src src-marriage">MARRIAGE CERT</span></td>
+		</tr>
+		<tr class="row-passport">
+		  <td class="label">Date of Birth</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		  <td class="label">Citizenship</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-passport">PASSPORT</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label">Eye Color</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		  <td class="label">Height</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-employment">
+		  <td class="label">Current Occupation</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-employment">EMPLOYMENT LETTER</span></td>
+		  <td class="label">Current Status in Canada</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label">Native Language</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		  <td class="label">Current Status Expiry</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label">Referred By</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		  <td class="label">Number of Children</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label">Course Start Date</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		  <td class="label">Course End Date</td>
+		  <td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Initially Entered Canada as; Visitor / Refugee / Student / Worker — Please Provide Your UCI Number</td>
+		  <td class="value"><input class="input-line" type="text" placeholder="Entry category"><span class="src src-manual">MANUAL</span></td>
+		  <td class="value"><div style="font-size:9px;color:#888;margin-bottom:2px;">****-****</div><input class="input-line" type="text" placeholder="UCI Number"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Date First Entered Canada and Port of Entry</td>
+		  <td class="value" colspan="2"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Have you ever been Deported / Refused Visa / Refused Entry to any country</td>
+		  <td class="yn-cell"><div class="yn-wrap"><div class="yn-label"><span>NO</span><input type="checkbox"></div><div class="yn-label"><span>YES</span><input type="checkbox"></div></div><span class="src src-manual">MANUAL</span></td>
+		  <td class="value"><div style="font-weight:600;font-size:10px;margin-bottom:4px;">Provide Details</div><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Have You Applied to IRCC before in past</td>
+		  <td class="yn-cell" colspan="2"><div class="yn-wrap"><div class="yn-label"><span>NO</span><input type="checkbox"></div><div class="yn-label"><span>YES</span><input type="checkbox"></div></div><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Have You Applied to any PNP before in past</td>
+		  <td class="yn-cell" colspan="2"><div class="yn-wrap"><div class="yn-label"><span>NO</span><input type="checkbox"></div><div class="yn-label"><span>YES</span><input type="checkbox"></div></div><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Do you have any relative in Canada</td>
+		  <td class="yn-cell" colspan="2"><div class="yn-wrap"><div class="yn-label"><span>NO</span><input type="checkbox"></div><div class="yn-label"><span>YES</span><input type="checkbox"></div></div><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Highest Education Completed (Canadian Equivalency)</td>
+		  <td class="value" colspan="2"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+		<tr class="row-manual">
+		  <td class="label" colspan="2">Total Number of Years of Education including primary, secondary and post-secondary education</td>
+		  <td class="value" colspan="2"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td>
+		</tr>
+	  </table>
+
+	  <!-- Education table Page 1 -->
+	  <div class="section-heading">List all Educational Institutes attended — most recent first, no gaps. Source: Educational Degree Certificates (ordered by completion date, most recent first)</div>
+	  <table class="complex-table">
+		<thead>
+		  <tr>
+			<th colspan="2">From</th><th colspan="2">To</th>
+			<th>Name of Educational Institution<br><span style="font-weight:400">(most recent first)</span></th>
+			<th>Years / hrs/week</th>
+			<th>Field of Study</th>
+			<th>City and Country</th>
+			<th>Certificate / Diploma Awarded</th>
+		  </tr>
+		  <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th></tr>
+		</thead>
+		<tbody>
+		  <tr class="row-degree">
+			<td></td><td></td><td></td><td></td>
+			<td><span class="src src-degree" style="font-size:8px">DEGREE CERT</span></td>
+			<td><span class="src src-degree" style="font-size:8px">DEGREE CERT</span></td>
+			<td><span class="src src-degree" style="font-size:8px">DEGREE CERT</span></td>
+			<td><span class="src src-degree" style="font-size:8px">DEGREE CERT</span></td>
+			<td><span class="src src-degree" style="font-size:8px">DEGREE CERT</span></td>
+		  </tr>
+		  <tr class="row-degree"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-degree"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-degree"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		</tbody>
+	  </table>
+	  <div class="page-number">1</div>
+	</div>
+
+	<!-- PAGE 2 -->
+	<div class="page-label">— Page 2 of 7 —</div>
+	<div class="page">
+	  <div class="section-heading">Educational Institutes — continued (Source: Educational Degree Certificates)</div>
+	  <table class="complex-table">
+		<thead>
+		  <tr>
+			<th colspan="2">From</th><th colspan="2">To</th>
+			<th>Name of Educational Institution</th>
+			<th>Years / hrs/week</th>
+			<th>Field of Study</th>
+			<th>City and Country / Complete Address</th>
+			<th>Certificate / Diploma Awarded</th>
+		  </tr>
+		  <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th></tr>
+		</thead>
+		<tbody>
+		  <tr class="row-degree"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-degree"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-degree"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-degree"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		</tbody>
+	  </table>
+
+	  <br>
+	  <!-- English Language Test -->
+	  <table>
+		<tr><td colspan="9" class="test-header">English Language Test</td></tr>
+		<tr>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Test</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Date of Test</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Date of Result</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Listening</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Reading</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Writing</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Speaking</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Overall Score</th>
+		  <th style="background:var(--gray-200);font-size:10px;padding:5px;text-align:center">Remarks</th>
+		</tr>
+		<tr class="row-ielts">
+		  <td style="font-weight:700;font-size:11px;text-align:center;background:#f5f3ff">IELTS<br><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-ielts" style="font-size:8px">IELTS SHEET</span></td>
+		  <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+		</tr>
+		<tr class="row-celpip">
+		  <td style="font-weight:700;font-size:11px;text-align:center;background:#f0f9ff">CELPIP<br><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-celpip" style="font-size:8px">CELPIP SHEET</span></td>
+		  <td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+		</tr>
+		<tr><td style="height:30px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+	  </table>
+	  <div class="initials-box">Initials</div>
+	  <div class="page-number">2</div>
+	</div>
+
+	<!-- PAGE 3 — Employment History -->
+	<div class="page-label">— Page 3 of 7 —</div>
+	<div class="page">
+	  <div class="section-heading">List all positions held during last 10 years — most recent first, no gaps. Source: Work Experience Certificates (one per employer). System extracts Job Start/End Date, Job Title, Salary, Job Type (Full/Part Time), Responsibilities per certificate. Rows ordered by date. Gap rows auto-inserted where gaps detected between certificates. Periods not covered by a certificate must be filled manually.</div>
+	  <table class="complex-table">
+		<thead>
+		  <tr>
+			<th colspan="2">From</th><th colspan="2">To</th>
+			<th>Name of Employer</th>
+			<th>Job Title / NOC</th>
+			<th>Job Type<br><span style="font-weight:400">Full / Part Time</span></th>
+			<th>Salary</th>
+			<th>City and Country / Address</th>
+			<th>Responsibilities</th>
+			<th>When qualified</th>
+		  </tr>
+		  <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
+		</thead>
+		<tbody>
+		  <!-- All rows: auto-filled from Work Experience Certificates ordered by date -->
+		  <tr class="row-employment">
+			<td style="height:48px" title="Auto-filled from Work Experience Certificate 1 (most recent)"></td><td></td><td></td><td></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 1</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 1</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 1</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 1</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 1</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 1</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+		  </tr>
+		  <!-- GAP ROW: auto-inserted when gap detected between Certificate 1 end date and Certificate 2 start date -->
+		  <tr style="background:#fff8e1;">
+			<td style="height:44px;background:#fff8e1;"></td><td style="background:#fff8e1;"></td><td style="background:#fff8e1;"></td><td style="background:#fff8e1;"></td>
+			<td colspan="7" style="background:#fff8e1;text-align:center;font-size:9px;color:#92400e;font-style:italic;border:1px dashed #f59e0b;">
+			  ⚠ Gap detected between Work Experience Certificate 1 and 2 — please fill this period manually
+			  <span class="src src-manual" style="font-size:8px;margin-left:8px">MANUAL — GAP ROW</span>
+			</td>
+		  </tr>
+		  <tr class="row-employment">
+			<td style="height:48px" title="Auto-filled from Work Experience Certificate 2"></td><td></td><td></td><td></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 2</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 2</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 2</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 2</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 2</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 2</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+		  </tr>
+		  <tr class="row-employment">
+			<td style="height:48px" title="Auto-filled from Work Experience Certificate 3"></td><td></td><td></td><td></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 3</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 3</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 3</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 3</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 3</span></td>
+			<td><span class="src src-employment" style="font-size:8px">WEX CERT 3</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+		  </tr>
+		  <tr class="row-manual">
+			<td style="height:48px" title="Manual — no certificate uploaded for this period"></td><td></td><td></td><td></td>
+			<td colspan="7" style="text-align:center;font-size:9px;color:#475569;font-style:italic;">
+			  No certificate uploaded for this period — manual entry required
+			  <span class="src src-manual" style="font-size:8px;margin-left:4px">MANUAL</span>
+			</td>
+		  </tr>
+		</tbody>
+	  </table>
+	  <div style="font-size:9px;color:#666;padding:4px 6px;background:#fff8e1;border:1px solid #fbbf24;margin-top:4px;">
+		📋 How this section works: Upload ALL employment letters — one per employer. The system extracts data from each letter and places entries in date order (most recent first). If a gap is detected between the end date of one job and the start date of the next, a highlighted gap row is automatically inserted for manual completion. Any period not covered by an uploaded letter must be filled manually.
+	  </div>
+	  <div class="initials-box">Initials</div>
+	  <div class="page-number">3</div>
+	</div>
+
+	<!-- PAGE 4 — Address History -->
+	<div class="page-label">— Page 4 of 7 —</div>
+	<div class="page">
+	  <div class="section-heading">List all addresses lived during last 10 years — most recent first, no gaps. All entries: Manual.</div>
+	  <table class="complex-table">
+		<thead>
+		  <tr>
+			<th colspan="2">From</th><th colspan="2">To</th>
+			<th>Complete Address Including Postal Code</th>
+			<th>Years / hrs/week</th>
+			<th>Owned / Rented / Shared</th>
+			<th>City and Country</th>
+			<th>Activity</th>
+		  </tr>
+		  <tr><th>Year</th><th>Month</th><th>Year</th><th>Month</th><th></th><th></th><th></th><th></th><th></th></tr>
+		</thead>
+		<tbody>
+		  <tr class="row-manual">
+			<td style="height:40px"></td><td></td><td></td><td></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+			<td><span class="src src-manual" style="font-size:8px">MANUAL</span></td>
+		  </tr>
+		  <tr class="row-manual"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-manual"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-manual"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		  <tr class="row-manual"><td style="height:40px"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		</tbody>
+	  </table>
+	  <div class="initials-box">Initials</div>
+	  <div class="page-number">4</div>
+	</div>
+
+	<!-- PAGE 5 — Children and Spouse -->
+	<div class="page-label">— Page 5 of 7 —</div>
+	<div class="page">
+	  <div class="section-heading" style="text-align:center;font-size:12px;padding:8px">Details of Children and Spouse</div>
+	  <table class="family-table">
+		<thead>
+		  <tr>
+			<th style="min-width:130px"></th>
+			<th class="col-applicant">Applicant<br><span style="font-weight:400;font-size:9px">← from applicant passport</span></th>
+			<th class="col-traveler">Spouse<br><span style="font-weight:400;font-size:9px">← from spouse passport</span></th>
+			<th class="col-traveler">Son / Daughter 1<br><span style="font-weight:400;font-size:9px">← from child passport</span></th>
+			<th class="col-traveler">Son / Daughter 2<br><span style="font-weight:400;font-size:9px">← from child passport</span></th>
+			<th class="col-traveler">Son / Daughter 3<br><span style="font-weight:400;font-size:9px">← from child passport</span></th>
+			<th class="col-traveler">Son / Daughter 4<br><span style="font-weight:400;font-size:9px">← from child passport</span></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr><td class="family-row-label">Family Name / Surname</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td></tr>
+		  <tr><td class="family-row-label">Given Names</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td></tr>
+		  <tr><td class="family-row-label">Date of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td></tr>
+		  <tr><td class="family-row-label">Place of Birth<br><span style="font-weight:400;font-size:9px">(city and country)</span></td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td></tr>
+		  <tr><td class="family-row-label">Country of Residence</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Citizenship</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td></tr>
+		  <tr><td class="family-row-label">Email / Telephone</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Marital Status</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Date of Marriage</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Passport No. / Country</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">CHILD PASSPORT</span></td></tr>
+		  <tr><td class="family-row-label">Address</td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td></tr>
+		  <tr><td class="family-row-label">Native Language</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Current Occupation</td><td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		</tbody>
+	  </table>
+	  <div class="initials-box">Initials</div>
+	  <div class="page-number">5</div>
+	</div>
+
+	<!-- PAGE 6 — Brothers and Sisters -->
+	<div class="page-label">— Page 6 of 7 —</div>
+	<div class="page">
+	  <div class="section-heading" style="text-align:center;font-size:12px;padding:8px">Details of Brothers and Sisters</div>
+	  <table class="family-table">
+		<thead>
+		  <tr>
+			<th style="min-width:130px"></th>
+			<th class="col-applicant">Applicant<br><span style="font-weight:400;font-size:9px">← from applicant passport</span></th>
+			<th>Brother/Sister 1<br><span style="font-weight:400;font-size:9px;color:#888">manual entry</span></th>
+			<th>Brother/Sister 2<br><span style="font-weight:400;font-size:9px;color:#888">manual entry</span></th>
+			<th>Brother/Sister 3<br><span style="font-weight:400;font-size:9px;color:#888">manual entry</span></th>
+			<th>Brother/Sister 4<br><span style="font-weight:400;font-size:9px;color:#888">manual entry</span></th>
+			<th>Brother/Sister 5<br><span style="font-weight:400;font-size:9px;color:#888">manual entry</span></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr><td class="family-row-label">Family Name / Surname</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Given Names</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Date of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Place of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Country of Residence</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Citizenship</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Email / Telephone</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Marital Status</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Address</td><td class="family-cell"><span class="src src-address" style="font-size:8px">ADDR PROOF</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Passport No. / Country</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Current Occupation</td><td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		  <tr><td class="family-row-label">Native Language</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+		</tbody>
+	  </table>
+	  <div class="initials-box">Initials</div>
+	  <div class="page-number">6</div>
+	</div>
+
+	<!-- PAGE 7 — Parents -->
+	<div class="page-label">— Page 7 of 7 —</div>
+	<div class="page">
+  <div class="section-heading" style="text-align:center;font-size:12px;padding:8px">Details of Parents</div>
+  <table class="family-table">
+    <thead>
+      <tr>
+        <th style="min-width:130px"></th>
+        <th class="col-applicant">Applicant<br><span style="font-weight:400;font-size:9px">← applicant passport</span></th>
+        <th>Father<br><span style="font-weight:400;font-size:9px;color:#888">manual</span></th>
+        <th>Mother<br><span style="font-weight:400;font-size:9px;color:#888">manual</span></th>
+        <th class="col-traveler">Spouse<br><span style="font-weight:400;font-size:9px">← spouse passport</span></th>
+        <th>Spouse's Father<br><span style="font-weight:400;font-size:9px;color:#888">manual</span></th>
+        <th>Spouse's Mother<br><span style="font-weight:400;font-size:9px;color:#888">manual</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="family-row-label">Family Name / Surname</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Given Names</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Date of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Place of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Country of Residence</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Citizenship</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Email / Telephone</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Marital Status</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Address</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Passport No. / Country</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Current Occupation</td><td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Native Language</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+    </tbody>
+  </table>
+
+  <br>
+  <table>
+    <tr class="row-manual"><td class="label" style="width:220px">Date of Entry in Canada</td><td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td></tr>
+    <tr class="row-manual"><td class="label">Date of Recent Entry in Canada</td><td class="value"><input class="input-line" type="text"><span class="src src-manual">MANUAL</span></td></tr>
+  </table>
+  <div class="initials-box">Initials</div>
+  <div class="page-number">7</div>
+</div>
+</section>
+
+<!-- FIELD ANALYSIS -->
+<div class="analysis">
+  <div class="analysis-header">Confirmed Field-to-Document Mapping — Final Version</div>
+  <div class="analysis-body">
+    <table class="analysis-table">
+      <thead>
+        <tr>
+          <th style="width:24%">Field</th>
+          <th style="width:22%">Source Document</th>
+          <th style="width:54%">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="category-row"><td colspan="3">PERSONAL DETAILS — Page 1 (Confirmed)</td></tr>
+        <tr><td class="field-name">Family Name / Surname (Last Name)</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted from passport data page exactly as printed. Maps to "Last Name" in spreadsheet.</td></tr>
+        <tr><td class="field-name">Given Names (First Name)</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted from passport data page exactly as printed. Maps to "First Name" in spreadsheet.</td></tr>
+        <tr><td class="field-name">Passport Number</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page and MRZ line 1. High confidence threshold.</td></tr>
+        <tr><td class="field-name">Date of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page. Format: YYYY-MM-DD.</td></tr>
+        <tr><td class="field-name">City of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted separately from Country of Birth. Spreadsheet confirms these are two distinct fields.</td></tr>
+        <tr><td class="field-name">Country of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted separately from City of Birth. Both from passport data page.</td></tr>
+        <tr><td class="field-name">Passport Issue Date</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page. Format: YYYY-MM-DD.</td></tr>
+        <tr><td class="field-name">Passport Expiry Date</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page and MRZ line 2. Critical field — high confidence threshold.</td></tr>
+        <tr><td class="field-name">Country of Issuance</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page. Not in spreadsheet explicitly but derived from passport.</td></tr>
+        <tr><td class="field-name">Current Address</td><td><span class="src src-address">ADDR PROOF</span></td><td>Single scan button labelled "Address Proof". Accepts any one of: Aadhar Card, Driving Licence, Passport, or Rent Agreement. System identifies the document type at runtime and extracts the address field from it. Fills the address field across all relevant sections of the form.</td></tr>
+        <tr><td class="field-name">Country of Residence</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Applicant may reside in a different country. Address document gives address, not necessarily country of residence for immigration purposes.</td></tr>
+        <tr><td class="field-name">Date of Marriage</td><td><span class="src src-marriage">MARRIAGE CERTIFICATE</span></td><td>Extracted from the Marriage Certificate. Upload only if married.</td></tr>
+        <tr><td class="field-name">Marital Status</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Marriage Certificate proves the marriage but the status label (Single/Married/Divorced/Widowed) is a manual declaration.</td></tr>
+        <tr><td class="field-name">Telephone Number</td><td><span class="src src-manual">MANUAL</span></td><td>No document source. Applicant enters directly.</td></tr>
+        <tr><td class="field-name">Email Address</td><td><span class="src src-manual">MANUAL</span></td><td>No document source. Applicant enters directly.</td></tr>
+        <tr><td class="field-name">Date of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>Single source confirmed. From passport data page.</td></tr>
+        <tr><td class="field-name">Citizenship</td><td><span class="src src-passport">PASSPORT</span></td><td>Single source confirmed. From nationality field on passport.</td></tr>
+        <tr><td class="field-name">Eye Color</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Not on any confirmed document.</td></tr>
+        <tr><td class="field-name">Height</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Not on any confirmed document.</td></tr>
+        <tr><td class="field-name">Current Occupation</td><td><span class="src src-employment">EMPLOYMENT LETTER</span></td><td>Single source confirmed. Job title extracted from employment letter.</td></tr>
+        <tr><td class="field-name">Current Status in Canada</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Requires applicant's Canadian permit/visa — not in confirmed list.</td></tr>
+        <tr><td class="field-name">Native Language</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. No document source.</td></tr>
+        <tr><td class="field-name">Current Status Expiry</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Canadian permit not in confirmed list.</td></tr>
+        <tr><td class="field-name">Referred By</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Internal referral field.</td></tr>
+        <tr><td class="field-name">Number of Children</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. No document source.</td></tr>
+        <tr><td class="field-name">Course Start / End Dates</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Study permit/offer letter not in confirmed list.</td></tr>
+        <tr><td class="field-name">Initial Entry Category / UCI</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Applicant must know their IRCC history.</td></tr>
+        <tr><td class="field-name">Date First Entered Canada / Port</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Passport entry stamps are unreliable for AI extraction.</td></tr>
+        <tr><td class="field-name">All Yes/No Declarations</td><td><span class="src src-manual">MANUAL</span></td><td>Deported, IRCC history, PNP history, relatives in Canada — all manual declarations.</td></tr>
+        <tr><td class="field-name">Highest Education / Total Years</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Canadian equivalency is a self-assessment by the applicant.</td></tr>
+
+        <tr class="category-row"><td colspan="3">EDUCATION HISTORY — Pages 1 & 2 (Confirmed: Educational Degree Certificates)</td></tr>
+        <tr><td class="field-name">Institution Name</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from the issuing institution name on each degree certificate. Multiple certificates uploaded — ordered by completion date, most recent first.</td></tr>
+        <tr><td class="field-name">Field of Study</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from degree/diploma title on the certificate.</td></tr>
+        <tr><td class="field-name">Completion Date (Year/Month)</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from issue date / convocation date on certificate. Used for "To" date. "From" date is calculated or manual.</td></tr>
+        <tr><td class="field-name">City and Country</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from institution address on the certificate.</td></tr>
+        <tr><td class="field-name">Certificate / Diploma Name</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from the certificate title — e.g. "Bachelor of Engineering", "Master of Business Administration".</td></tr>
+        <tr><td class="field-name">Duration / Hours per week</td><td><span class="src src-manual">MANUAL</span></td><td>Not typically on a degree certificate. Manual entry by applicant.</td></tr>
+        <tr><td class="field-name">Start Date (From)</td><td><span class="src src-manual">MANUAL</span></td><td>Start dates are rarely on a degree certificate. Manual entry.</td></tr>
+
+        <tr class="category-row"><td colspan="3">ENGLISH LANGUAGE TEST — Page 2 (Confirmed: IELTS / CELPIP Score Sheets)</td></tr>
+        <tr><td class="field-name">IELTS — Date of Test</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>Clearly printed on the official IELTS Test Report Form (TRF).</td></tr>
+        <tr><td class="field-name">IELTS — Date of Result</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>Result date on the TRF.</td></tr>
+        <tr><td class="field-name">IELTS — Listening / Reading / Writing / Speaking</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>All four band scores extracted from the TRF. Scores are in X.X format (e.g. 7.5).</td></tr>
+        <tr><td class="field-name">IELTS — Overall Band Score</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>Overall band score from TRF.</td></tr>
+        <tr><td class="field-name">CELPIP — All score fields</td><td><span class="src src-celpip">CELPIP SCORE SHEET</span></td><td>Same pattern as IELTS. All fields extracted from official CELPIP score report. Scores are numeric 1–12.</td></tr>
+        <tr><td class="field-name">Remarks</td><td><span class="src src-manual">MANUAL</span></td><td>Agent or applicant notes. Manual entry.</td></tr>
+
+        <tr class="category-row"><td colspan="3">EMPLOYMENT HISTORY — Page 3 (Source: Work Experience Certificates — one per employer, all jobs)</td></tr>
+        <tr><td class="field-name">Job Start Date</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from each certificate — joining date or start date field.</td></tr>
+        <tr><td class="field-name">Job End Date</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from each certificate — relieving date or last working day. If not present (still employed), system leaves blank.</td></tr>
+        <tr><td class="field-name">Job Title</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from the designation/title field on the certificate.</td></tr>
+        <tr><td class="field-name">Salary</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>NEW field from spreadsheet. Extracted from salary/CTC field on the certificate. Format preserved as stated (e.g. INR 8,00,000 per annum).</td></tr>
+        <tr><td class="field-name">Job Type — Full / Part Time</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>NEW field from spreadsheet. Extracted from the employment type field. If not explicitly stated, system leaves blank for manual entry.</td></tr>
+        <tr><td class="field-name">Responsibilities</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>NEW field from spreadsheet. Extracted from the duties/responsibilities section of the certificate. May be a multi-line text block.</td></tr>
+        <tr><td class="field-name">Employer Name / Address</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from company letterhead or issuing authority section of the certificate.</td></tr>
+        <tr><td class="field-name">Row ordering</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>All certificates sorted by job date. Most recent employer in Row 1. Older roles fill subsequent rows automatically.</td></tr>
+        <tr><td class="field-name">Gap detection</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span> + <span class="src src-manual">MANUAL</span></td><td>System compares end date of each role against start date of the next. Gap > 30 days triggers auto-insertion of a highlighted blank gap row for manual completion.</td></tr>
+        <tr><td class="field-name">Periods with no certificate uploaded</td><td><span class="src src-manual">MANUAL</span></td><td>Periods not covered by any uploaded certificate must be completed manually by the applicant.</td></tr>
+
+        <tr class="category-row"><td colspan="3">ADDRESS HISTORY — Page 4 (Confirmed: All Manual)</td></tr>
+        <tr><td class="field-name">All address history fields</td><td><span class="src src-manual">MANUAL</span></td><td>Confirmed manual by immigration agency. All 10 years of address history entered by applicant. No document source for this section.</td></tr>
+
+        <tr class="category-row"><td colspan="3">FAMILY DETAILS — Pages 5, 6, 7</td></tr>
+        <tr><td class="field-name">Applicant column — identity fields</td><td><span class="src src-passport">PASSPORT</span></td><td>Applicant's own surname, given names, DOB, place of birth, citizenship, passport number — auto-filled from applicant passport already uploaded.</td></tr>
+        <tr><td class="field-name">Applicant column — current occupation</td><td><span class="src src-employment">EMPLOYMENT LETTER</span></td><td>Applicant's own occupation — auto-filled from employment letter already uploaded.</td></tr>
+        <tr><td class="field-name">Spouse column — passport-extractable fields</td><td><span class="src src-traveler">SPOUSE PASSPORT</span></td><td>If spouse declared as accompanying traveler and spouse passport is uploaded: surname, given names, DOB, place of birth, citizenship, passport number and country of issuance are auto-filled. Spouse passport is a hard stop — form cannot submit without it if spouse is declared.</td></tr>
+        <tr><td class="field-name">Child columns — passport-extractable fields</td><td><span class="src src-traveler">CHILD PASSPORT</span></td><td>Same as spouse. For each child declared as accompanying traveler: their passport is uploaded and data auto-fills their column. Each child passport is a hard stop for that child.</td></tr>
+        <tr><td class="field-name">Birth Certificate — spouse or child</td><td><span class="src src-proof">PROOF ONLY</span></td><td>Optional upload per traveler. Stored as a supporting proof document attached to the submission. No data is extracted from it under any circumstances. All data comes exclusively from the traveler's passport.</td></tr>
+        <tr><td class="field-name">Address — applicant + all travelers (Page 5)</td><td><span class="src src-address">ADDR PROOF</span></td><td>Per spreadsheet: Address for ALL columns in the Children and Spouse table (applicant, spouse, all children) is sourced from Address Proof document (Aadhar/DL/Passport/Rent Agreement). Each traveler's address proof is uploaded separately.</td></tr>
+        <tr><td class="field-name">Address — applicant (Pages 6 & 7)</td><td><span class="src src-address">ADDR PROOF</span></td><td>Applicant address filled from Address Proof. Siblings and parents addresses are manual entry.</td></tr>
+        <tr><td class="field-name">Spouse column — identity fields (Page 7 Parents table)</td><td><span class="src src-traveler">SPOUSE PASSPORT</span></td><td>Per spreadsheet: In the Parents table, the Spouse column is filled from Spouse Passport — not manual. Spouse's Father and Spouse's Mother remain manual.</td></tr>
+        <tr><td class="field-name">Spouse/child — remaining manual fields</td><td><span class="src src-manual">MANUAL</span></td><td>Country of residence, email/telephone, marital status, date of marriage, native language — all manual for spouse and children. Date of Marriage is manual for all family members (marriage cert fills applicant's own field only).</td></tr>
+        <tr><td class="field-name">Siblings columns — all fields</td><td><span class="src src-manual">MANUAL</span></td><td>Siblings are not accompanying travelers in this workflow. All sibling columns on Page 6 are manual entry. Applicant column auto-filled from applicant passport as usual.</td></tr>
+        <tr><td class="field-name">Parents columns — all fields</td><td><span class="src src-manual">MANUAL</span></td><td>Parents are not accompanying travelers. All parent columns on Page 7 are manual. Applicant column auto-filled from applicant passport as usual.</td></tr>
+        <tr><td class="field-name">All Accompanying Yes/No</td><td><span class="src src-manual">MANUAL</span></td><td>Manual selection for all family members regardless of traveler status.</td></tr>
+
+        <tr class="category-row"><td colspan="3">PROOF OF FUNDS DOCUMENTS — Upload Only, No Data Extracted</td></tr>
+        <tr><td class="field-name">6 Monthly Bank Statement</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as an attachment to the submission. No fields extracted. Agent reviews manually.</td></tr>
+        <tr><td class="field-name">Last 3 Salary Slips</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Tax Return Receipt</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Net Worth Statement</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Property Ownership Document</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr class="category-row"><td colspan="3">UPLOAD-ONLY DOCUMENTS — No Data Extracted, No Proof Category</td></tr>
+        <tr><td class="field-name">Birth Certificate</td><td><span class="src src-proof">PROOF OF BIRTH</span></td><td>Optional. Stored as proof of birth attachment. No data extracted under any circumstances. All birth-related data comes from the passport.</td></tr>
+        <tr><td class="field-name">Event Invitation Letter</td><td><span class="src src-upload">UPLOAD ONLY</span></td><td>Stored as attachment. No data extracted. No proof category.</td></tr>
+        <tr><td class="field-name">Travel Tickets</td><td><span class="src src-upload">UPLOAD ONLY</span></td><td>Stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Digital Picture</td><td><span class="src src-upload">UPLOAD ONLY</span></td><td>Stored as attachment. No data extracted. Applicant's photograph for the application.</td></tr>
+        <tr class="category-row"><td colspan="3">CANADA ENTRY DATES — Page 7</td></tr>
+        <tr><td class="field-name">Date of Entry / Recent Entry</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Passport entry stamps are not reliably extractable by AI.</td></tr>
+
+      </tbody>
+    </table>
+
+    <!-- Summary -->
+    <div style="margin-top:24px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:12px;font-family:'Source Serif 4',serif;">Final Auto-Fill Coverage Summary</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px;">
+        <div>
+          <div style="font-weight:700;color:#15803d;margin-bottom:8px;font-size:12px;">✓ AI Auto-Fill (5 document types)</div>
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:10px;line-height:2.1;">
+            <strong>From Passport:</strong><br>
+            Surname, Given Names, DOB, Place of Birth, Citizenship,<br>
+            Passport No., Issue Date, Expiry Date, Country of Issuance<br>
+            + Applicant columns repeated in all family tables (Pages 5–7)<br><br>
+            <strong>From Work Experience Certificates (all uploaded):</strong><br>
+            Employer Name, Job Title, Salary, Job Type (Full/Part Time),<br>
+            Job Start/End Dates, Employer Address, Responsibilities per certificate.<br>
+            Rows ordered by date (most recent first).<br>
+            Gap rows auto-inserted where gaps detected between certificates.<br><br>
+            <strong>From Proof of Funds documents (5 types):</strong><br>
+            No data extracted — stored as attachments only.<br><br>
+            <strong>From Upload-Only documents (4 types):</strong><br>
+            No data extracted — stored as attachments only.<br><br>
+            <strong>From Degree Certificates:</strong><br>
+            Institution Name, Field of Study, Completion Date,<br>
+            City/Country, Qualification Title (per certificate uploaded)<br><br>
+            <strong>From IELTS Score Sheet:</strong><br>
+            Test Date, Result Date, L/R/W/S Scores, Overall Score<br><br>
+            <strong>From CELPIP Score Sheet:</strong><br>
+            Test Date, Result Date, L/R/W/S Scores, Overall Score
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;color:#be123c;margin-bottom:8px;font-size:12px;">✗ Always Manual Entry</div>
+          <div style="background:#fff1f2;border:1px solid #fda4af;border-radius:4px;padding:10px;line-height:2.1;">
+            Phone Number, Email Address<br>
+            Eye Color, Height<br>
+            Country of Residence, Marital Status, Date of Marriage<br>
+            Native Language, Number of Children<br>
+            Current Status in Canada + Expiry<br>
+            UCI Number, Initial Entry Category<br>
+            Date First Entered Canada, Port of Entry<br>
+            Course Start/End Dates, Referred By<br>
+            All Yes/No Declarations (IRCC, PNP, Deported, Relatives)<br>
+            Highest Education Level, Total Years of Education<br>
+            Education Start Dates + Duration/Hours per week<br>
+            Employment periods not covered by an uploaded certificate<br>
+            Gap periods between jobs (auto-inserted blank rows)<br>
+            "When qualified for this job" column (all rows)<br>
+            Marital Status (Date of Marriage from cert, but status label is manual)<br>
+            Country of Residence (address from Aadhar/DL, but residence country is manual)<br>
+            All address history (all rows)<br>
+            Siblings and parents details (Pages 6 & 7) — all manual<br>
+            Spouse/child manual fields: residence, phone, marital status, occupation<br>
+            All Accompanying Yes/No selections<br>
+            Canada entry dates
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:20px;">
+        <div style="flex:1;background:#eff6ff;border:1px solid #93c5fd;border-radius:4px;padding:12px;text-align:center;">
+          <div style="font-size:28px;font-weight:700;color:#1d4ed8;">~50%</div>
+          <div style="font-size:11px;color:#1d4ed8;font-weight:600;">of form fields auto-filled</div>
+          <div style="font-size:10px;color:#666;margin-top:4px;">7 extraction docs + traveler passports</div>
+        </div>
+        <div style="flex:1;background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:12px;font-size:11px;color:#166534;">
+          <strong>Key insight:</strong> The auto-filled fields are the most tedious to type — identity data, test scores, and education credentials. Even at 35% coverage, the time saved per application is significant. Traveler passports significantly increase coverage in the family tables (Pages 5–7). Each accompanying spouse or child passport eliminates manual entry of their core identity fields. The remaining manual burden covers relationship data, immigration history, and sibling/parent details which genuinely require the applicant's knowledge.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html><tbody>
+      <tr><td class="family-row-label">Family Name / Surname</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Given Names</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Date of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Place of Birth</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Country of Residence</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Citizenship</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Email / Telephone</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Marital Status</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Address</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Passport No. / Country</td><td class="family-cell"><span class="src src-passport" style="font-size:8px">PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-traveler" style="font-size:8px">SPOUSE PASSPORT</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Current Occupation</td><td class="family-cell"><span class="src src-employment" style="font-size:8px">EMPLOY LETTER</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+      <tr><td class="family-row-label">Native Language</td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td><td class="family-cell"><span class="src src-manual" style="font-size:8px">MANUAL</span></td></tr>
+    </tbody><!-- FIELD ANALYSIS -->
+<div class="analysis">
+  <div class="analysis-header">Confirmed Field-to-Document Mapping — Final Version</div>
+  <div class="analysis-body">
+    <table class="analysis-table">
+      <thead>
+        <tr>
+          <th style="width:24%">Field</th>
+          <th style="width:22%">Source Document</th>
+          <th style="width:54%">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="category-row"><td colspan="3">PERSONAL DETAILS — Page 1 (Confirmed)</td></tr>
+        <tr><td class="field-name">Family Name / Surname (Last Name)</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted from passport data page exactly as printed. Maps to "Last Name" in spreadsheet.</td></tr>
+        <tr><td class="field-name">Given Names (First Name)</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted from passport data page exactly as printed. Maps to "First Name" in spreadsheet.</td></tr>
+        <tr><td class="field-name">Passport Number</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page and MRZ line 1. High confidence threshold.</td></tr>
+        <tr><td class="field-name">Date of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page. Format: YYYY-MM-DD.</td></tr>
+        <tr><td class="field-name">City of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted separately from Country of Birth. Spreadsheet confirms these are two distinct fields.</td></tr>
+        <tr><td class="field-name">Country of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>Extracted separately from City of Birth. Both from passport data page.</td></tr>
+        <tr><td class="field-name">Passport Issue Date</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page. Format: YYYY-MM-DD.</td></tr>
+        <tr><td class="field-name">Passport Expiry Date</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page and MRZ line 2. Critical field — high confidence threshold.</td></tr>
+        <tr><td class="field-name">Country of Issuance</td><td><span class="src src-passport">PASSPORT</span></td><td>From passport data page. Not in spreadsheet explicitly but derived from passport.</td></tr>
+        <tr><td class="field-name">Current Address</td><td><span class="src src-address">ADDR PROOF</span></td><td>Single scan button labelled "Address Proof". Accepts any one of: Aadhar Card, Driving Licence, Passport, or Rent Agreement. System identifies the document type at runtime and extracts the address field from it. Fills the address field across all relevant sections of the form.</td></tr>
+        <tr><td class="field-name">Country of Residence</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Applicant may reside in a different country. Address document gives address, not necessarily country of residence for immigration purposes.</td></tr>
+        <tr><td class="field-name">Date of Marriage</td><td><span class="src src-marriage">MARRIAGE CERTIFICATE</span></td><td>Extracted from the Marriage Certificate. Upload only if married.</td></tr>
+        <tr><td class="field-name">Marital Status</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Marriage Certificate proves the marriage but the status label (Single/Married/Divorced/Widowed) is a manual declaration.</td></tr>
+        <tr><td class="field-name">Telephone Number</td><td><span class="src src-manual">MANUAL</span></td><td>No document source. Applicant enters directly.</td></tr>
+        <tr><td class="field-name">Email Address</td><td><span class="src src-manual">MANUAL</span></td><td>No document source. Applicant enters directly.</td></tr>
+        <tr><td class="field-name">Date of Birth</td><td><span class="src src-passport">PASSPORT</span></td><td>Single source confirmed. From passport data page.</td></tr>
+        <tr><td class="field-name">Citizenship</td><td><span class="src src-passport">PASSPORT</span></td><td>Single source confirmed. From nationality field on passport.</td></tr>
+        <tr><td class="field-name">Eye Color</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Not on any confirmed document.</td></tr>
+        <tr><td class="field-name">Height</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Not on any confirmed document.</td></tr>
+        <tr><td class="field-name">Current Occupation</td><td><span class="src src-employment">EMPLOYMENT LETTER</span></td><td>Single source confirmed. Job title extracted from employment letter.</td></tr>
+        <tr><td class="field-name">Current Status in Canada</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Requires applicant's Canadian permit/visa — not in confirmed list.</td></tr>
+        <tr><td class="field-name">Native Language</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. No document source.</td></tr>
+        <tr><td class="field-name">Current Status Expiry</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Canadian permit not in confirmed list.</td></tr>
+        <tr><td class="field-name">Referred By</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Internal referral field.</td></tr>
+        <tr><td class="field-name">Number of Children</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. No document source.</td></tr>
+        <tr><td class="field-name">Course Start / End Dates</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Study permit/offer letter not in confirmed list.</td></tr>
+        <tr><td class="field-name">Initial Entry Category / UCI</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Applicant must know their IRCC history.</td></tr>
+        <tr><td class="field-name">Date First Entered Canada / Port</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Passport entry stamps are unreliable for AI extraction.</td></tr>
+        <tr><td class="field-name">All Yes/No Declarations</td><td><span class="src src-manual">MANUAL</span></td><td>Deported, IRCC history, PNP history, relatives in Canada — all manual declarations.</td></tr>
+        <tr><td class="field-name">Highest Education / Total Years</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Canadian equivalency is a self-assessment by the applicant.</td></tr>
+
+        <tr class="category-row"><td colspan="3">EDUCATION HISTORY — Pages 1 & 2 (Confirmed: Educational Degree Certificates)</td></tr>
+        <tr><td class="field-name">Institution Name</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from the issuing institution name on each degree certificate. Multiple certificates uploaded — ordered by completion date, most recent first.</td></tr>
+        <tr><td class="field-name">Field of Study</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from degree/diploma title on the certificate.</td></tr>
+        <tr><td class="field-name">Completion Date (Year/Month)</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from issue date / convocation date on certificate. Used for "To" date. "From" date is calculated or manual.</td></tr>
+        <tr><td class="field-name">City and Country</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from institution address on the certificate.</td></tr>
+        <tr><td class="field-name">Certificate / Diploma Name</td><td><span class="src src-degree">DEGREE CERT</span></td><td>Extracted from the certificate title — e.g. "Bachelor of Engineering", "Master of Business Administration".</td></tr>
+        <tr><td class="field-name">Duration / Hours per week</td><td><span class="src src-manual">MANUAL</span></td><td>Not typically on a degree certificate. Manual entry by applicant.</td></tr>
+        <tr><td class="field-name">Start Date (From)</td><td><span class="src src-manual">MANUAL</span></td><td>Start dates are rarely on a degree certificate. Manual entry.</td></tr>
+
+        <tr class="category-row"><td colspan="3">ENGLISH LANGUAGE TEST — Page 2 (Confirmed: IELTS / CELPIP Score Sheets)</td></tr>
+        <tr><td class="field-name">IELTS — Date of Test</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>Clearly printed on the official IELTS Test Report Form (TRF).</td></tr>
+        <tr><td class="field-name">IELTS — Date of Result</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>Result date on the TRF.</td></tr>
+        <tr><td class="field-name">IELTS — Listening / Reading / Writing / Speaking</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>All four band scores extracted from the TRF. Scores are in X.X format (e.g. 7.5).</td></tr>
+        <tr><td class="field-name">IELTS — Overall Band Score</td><td><span class="src src-ielts">IELTS SCORE SHEET</span></td><td>Overall band score from TRF.</td></tr>
+        <tr><td class="field-name">CELPIP — All score fields</td><td><span class="src src-celpip">CELPIP SCORE SHEET</span></td><td>Same pattern as IELTS. All fields extracted from official CELPIP score report. Scores are numeric 1–12.</td></tr>
+        <tr><td class="field-name">Remarks</td><td><span class="src src-manual">MANUAL</span></td><td>Agent or applicant notes. Manual entry.</td></tr>
+
+        <tr class="category-row"><td colspan="3">EMPLOYMENT HISTORY — Page 3 (Source: Work Experience Certificates — one per employer, all jobs)</td></tr>
+        <tr><td class="field-name">Job Start Date</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from each certificate — joining date or start date field.</td></tr>
+        <tr><td class="field-name">Job End Date</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from each certificate — relieving date or last working day. If not present (still employed), system leaves blank.</td></tr>
+        <tr><td class="field-name">Job Title</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from the designation/title field on the certificate.</td></tr>
+        <tr><td class="field-name">Salary</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>NEW field from spreadsheet. Extracted from salary/CTC field on the certificate. Format preserved as stated (e.g. INR 8,00,000 per annum).</td></tr>
+        <tr><td class="field-name">Job Type — Full / Part Time</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>NEW field from spreadsheet. Extracted from the employment type field. If not explicitly stated, system leaves blank for manual entry.</td></tr>
+        <tr><td class="field-name">Responsibilities</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>NEW field from spreadsheet. Extracted from the duties/responsibilities section of the certificate. May be a multi-line text block.</td></tr>
+        <tr><td class="field-name">Employer Name / Address</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>Extracted from company letterhead or issuing authority section of the certificate.</td></tr>
+        <tr><td class="field-name">Row ordering</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span></td><td>All certificates sorted by job date. Most recent employer in Row 1. Older roles fill subsequent rows automatically.</td></tr>
+        <tr><td class="field-name">Gap detection</td><td><span class="src src-employment">WORK EXPERIENCE CERT</span> + <span class="src src-manual">MANUAL</span></td><td>System compares end date of each role against start date of the next. Gap > 30 days triggers auto-insertion of a highlighted blank gap row for manual completion.</td></tr>
+        <tr><td class="field-name">Periods with no certificate uploaded</td><td><span class="src src-manual">MANUAL</span></td><td>Periods not covered by any uploaded certificate must be completed manually by the applicant.</td></tr>
+
+        <tr class="category-row"><td colspan="3">ADDRESS HISTORY — Page 4 (Confirmed: All Manual)</td></tr>
+        <tr><td class="field-name">All address history fields</td><td><span class="src src-manual">MANUAL</span></td><td>Confirmed manual by immigration agency. All 10 years of address history entered by applicant. No document source for this section.</td></tr>
+
+        <tr class="category-row"><td colspan="3">FAMILY DETAILS — Pages 5, 6, 7</td></tr>
+        <tr><td class="field-name">Applicant column — identity fields</td><td><span class="src src-passport">PASSPORT</span></td><td>Applicant's own surname, given names, DOB, place of birth, citizenship, passport number — auto-filled from applicant passport already uploaded.</td></tr>
+        <tr><td class="field-name">Applicant column — current occupation</td><td><span class="src src-employment">EMPLOYMENT LETTER</span></td><td>Applicant's own occupation — auto-filled from employment letter already uploaded.</td></tr>
+        <tr><td class="field-name">Spouse column — passport-extractable fields</td><td><span class="src src-traveler">SPOUSE PASSPORT</span></td><td>If spouse declared as accompanying traveler and spouse passport is uploaded: surname, given names, DOB, place of birth, citizenship, passport number and country of issuance are auto-filled. Spouse passport is a hard stop — form cannot submit without it if spouse is declared.</td></tr>
+        <tr><td class="field-name">Child columns — passport-extractable fields</td><td><span class="src src-traveler">CHILD PASSPORT</span></td><td>Same as spouse. For each child declared as accompanying traveler: their passport is uploaded and data auto-fills their column. Each child passport is a hard stop for that child.</td></tr>
+        <tr><td class="field-name">Birth Certificate — spouse or child</td><td><span class="src src-proof">PROOF ONLY</span></td><td>Optional upload per traveler. Stored as a supporting proof document attached to the submission. No data is extracted from it under any circumstances. All data comes exclusively from the traveler's passport.</td></tr>
+        <tr><td class="field-name">Address — applicant + all travelers (Page 5)</td><td><span class="src src-address">ADDR PROOF</span></td><td>Per spreadsheet: Address for ALL columns in the Children and Spouse table (applicant, spouse, all children) is sourced from Address Proof document (Aadhar/DL/Passport/Rent Agreement). Each traveler's address proof is uploaded separately.</td></tr>
+        <tr><td class="field-name">Address — applicant (Pages 6 & 7)</td><td><span class="src src-address">ADDR PROOF</span></td><td>Applicant address filled from Address Proof. Siblings and parents addresses are manual entry.</td></tr>
+        <tr><td class="field-name">Spouse column — identity fields (Page 7 Parents table)</td><td><span class="src src-traveler">SPOUSE PASSPORT</span></td><td>Per spreadsheet: In the Parents table, the Spouse column is filled from Spouse Passport — not manual. Spouse's Father and Spouse's Mother remain manual.</td></tr>
+        <tr><td class="field-name">Spouse/child — remaining manual fields</td><td><span class="src src-manual">MANUAL</span></td><td>Country of residence, email/telephone, marital status, date of marriage, native language — all manual for spouse and children. Date of Marriage is manual for all family members (marriage cert fills applicant's own field only).</td></tr>
+        <tr><td class="field-name">Siblings columns — all fields</td><td><span class="src src-manual">MANUAL</span></td><td>Siblings are not accompanying travelers in this workflow. All sibling columns on Page 6 are manual entry. Applicant column auto-filled from applicant passport as usual.</td></tr>
+        <tr><td class="field-name">Parents columns — all fields</td><td><span class="src src-manual">MANUAL</span></td><td>Parents are not accompanying travelers. All parent columns on Page 7 are manual. Applicant column auto-filled from applicant passport as usual.</td></tr>
+        <tr><td class="field-name">All Accompanying Yes/No</td><td><span class="src src-manual">MANUAL</span></td><td>Manual selection for all family members regardless of traveler status.</td></tr>
+
+        <tr class="category-row"><td colspan="3">PROOF OF FUNDS DOCUMENTS — Upload Only, No Data Extracted</td></tr>
+        <tr><td class="field-name">6 Monthly Bank Statement</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as an attachment to the submission. No fields extracted. Agent reviews manually.</td></tr>
+        <tr><td class="field-name">Last 3 Salary Slips</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Tax Return Receipt</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Net Worth Statement</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Property Ownership Document</td><td><span class="src src-funds">PROOF OF FUNDS</span></td><td>Uploaded and stored as attachment. No data extracted.</td></tr>
+        <tr class="category-row"><td colspan="3">UPLOAD-ONLY DOCUMENTS — No Data Extracted, No Proof Category</td></tr>
+        <tr><td class="field-name">Birth Certificate</td><td><span class="src src-proof">PROOF OF BIRTH</span></td><td>Optional. Stored as proof of birth attachment. No data extracted under any circumstances. All birth-related data comes from the passport.</td></tr>
+        <tr><td class="field-name">Event Invitation Letter</td><td><span class="src src-upload">UPLOAD ONLY</span></td><td>Stored as attachment. No data extracted. No proof category.</td></tr>
+        <tr><td class="field-name">Travel Tickets</td><td><span class="src src-upload">UPLOAD ONLY</span></td><td>Stored as attachment. No data extracted.</td></tr>
+        <tr><td class="field-name">Digital Picture</td><td><span class="src src-upload">UPLOAD ONLY</span></td><td>Stored as attachment. No data extracted. Applicant's photograph for the application.</td></tr>
+        <tr class="category-row"><td colspan="3">CANADA ENTRY DATES — Page 7</td></tr>
+        <tr><td class="field-name">Date of Entry / Recent Entry</td><td><span class="src src-manual">MANUAL</span></td><td>Manual entry. Passport entry stamps are not reliably extractable by AI.</td></tr>
+
+      </tbody>
+    </table>
+
+    <!-- Summary -->
+    <div style="margin-top:24px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:12px;font-family:'Source Serif 4',serif;">Final Auto-Fill Coverage Summary</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px;">
+        <div>
+          <div style="font-weight:700;color:#15803d;margin-bottom:8px;font-size:12px;">✓ AI Auto-Fill (5 document types)</div>
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:10px;line-height:2.1;">
+            <strong>From Passport:</strong><br>
+            Surname, Given Names, DOB, Place of Birth, Citizenship,<br>
+            Passport No., Issue Date, Expiry Date, Country of Issuance<br>
+            + Applicant columns repeated in all family tables (Pages 5–7)<br><br>
+            <strong>From Work Experience Certificates (all uploaded):</strong><br>
+            Employer Name, Job Title, Salary, Job Type (Full/Part Time),<br>
+            Job Start/End Dates, Employer Address, Responsibilities per certificate.<br>
+            Rows ordered by date (most recent first).<br>
+            Gap rows auto-inserted where gaps detected between certificates.<br><br>
+            <strong>From Proof of Funds documents (5 types):</strong><br>
+            No data extracted — stored as attachments only.<br><br>
+            <strong>From Upload-Only documents (4 types):</strong><br>
+            No data extracted — stored as attachments only.<br><br>
+            <strong>From Degree Certificates:</strong><br>
+            Institution Name, Field of Study, Completion Date,<br>
+            City/Country, Qualification Title (per certificate uploaded)<br><br>
+            <strong>From IELTS Score Sheet:</strong><br>
+            Test Date, Result Date, L/R/W/S Scores, Overall Score<br><br>
+            <strong>From CELPIP Score Sheet:</strong><br>
+            Test Date, Result Date, L/R/W/S Scores, Overall Score
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;color:#be123c;margin-bottom:8px;font-size:12px;">✗ Always Manual Entry</div>
+          <div style="background:#fff1f2;border:1px solid #fda4af;border-radius:4px;padding:10px;line-height:2.1;">
+            Phone Number, Email Address<br>
+            Eye Color, Height<br>
+            Country of Residence, Marital Status, Date of Marriage<br>
+            Native Language, Number of Children<br>
+            Current Status in Canada + Expiry<br>
+            UCI Number, Initial Entry Category<br>
+            Date First Entered Canada, Port of Entry<br>
+            Course Start/End Dates, Referred By<br>
+            All Yes/No Declarations (IRCC, PNP, Deported, Relatives)<br>
+            Highest Education Level, Total Years of Education<br>
+            Education Start Dates + Duration/Hours per week<br>
+            Employment periods not covered by an uploaded certificate<br>
+            Gap periods between jobs (auto-inserted blank rows)<br>
+            "When qualified for this job" column (all rows)<br>
+            Marital Status (Date of Marriage from cert, but status label is manual)<br>
+            Country of Residence (address from Aadhar/DL, but residence country is manual)<br>
+            All address history (all rows)<br>
+            Siblings and parents details (Pages 6 & 7) — all manual<br>
+            Spouse/child manual fields: residence, phone, marital status, occupation<br>
+            All Accompanying Yes/No selections<br>
+            Canada entry dates
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:20px;">
+        <div style="flex:1;background:#eff6ff;border:1px solid #93c5fd;border-radius:4px;padding:12px;text-align:center;">
+          <div style="font-size:28px;font-weight:700;color:#1d4ed8;">~50%</div>
+          <div style="font-size:11px;color:#1d4ed8;font-weight:600;">of form fields auto-filled</div>
+          <div style="font-size:10px;color:#666;margin-top:4px;">7 extraction docs + traveler passports</div>
+        </div>
+        <div style="flex:1;background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:12px;font-size:11px;color:#166534;">
+          <strong>Key insight:</strong> The auto-filled fields are the most tedious to type — identity data, test scores, and education credentials. Even at 35% coverage, the time saved per application is significant. Traveler passports significantly increase coverage in the family tables (Pages 5–7). Each accompanying spouse or child passport eliminates manual entry of their core identity fields. The remaining manual burden covers relationship data, immigration history, and sibling/parent details which genuinely require the applicant's knowledge.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

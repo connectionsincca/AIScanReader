@@ -37,8 +37,13 @@ Camera capture (canvas)
   → validateScan API       GPT-4o (low detail) checks document type
   → extractData API        GPT-4o (high detail) OCR extracts form fields
   → AppContext.applyExtracted()  merges into formData with confidence scores
-  → submitPackage API      server builds PDF (pdf-lib) → emails (nodemailer) → no disk write
+  → submitPackage API      server generates TWO PDFs in parallel:
+                             • documentsPdf  — scanned page images
+                             • formPdf       — filled intake form data
+                           both passed directly to nodemailer → no disk write
 ```
+
+Images are transmitted to the server as base64 strings in a JSON body. Express is configured with a **50 MB body limit** (`express.json({ limit: '50mb' })`); stay below this when adding new document types or increasing page caps.
 
 ### Client state
 
