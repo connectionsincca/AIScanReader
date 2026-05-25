@@ -98,81 +98,168 @@ interface FormSection {
 }
 
 const FORM_SECTIONS: { id: string; title: string; fields: { key: keyof FormData; label: string }[] }[] = [
+  // ── Page 1 — Applicant Identity ─────────────────────────────────────────────
   {
-    id: 'personal', title: 'Personal Information',
+    id: 'identity', title: 'Applicant — Identity',
     fields: [
-      { key: 'firstName',    label: 'First Name'      },
-      { key: 'lastName',     label: 'Last Name'       },
-      { key: 'dateOfBirth',  label: 'Date of Birth'   },
-      { key: 'gender',       label: 'Gender'          },
-      { key: 'nationality',  label: 'Nationality'     },
-      { key: 'placeOfBirth', label: 'Place of Birth'  },
-      { key: 'countryOfBirth',label:'Country of Birth'},
+      { key: 'firstName',         label: 'First Name'            },
+      { key: 'lastName',          label: 'Last Name'             },
+      { key: 'dateOfBirth',       label: 'Date of Birth'         },
+      { key: 'cityOfBirth',       label: 'City of Birth'         },
+      { key: 'countryOfBirth',    label: 'Country of Birth'      },
+      { key: 'citizenship',       label: 'Citizenship'           },
+      { key: 'eyeColor',          label: 'Eye Colour'            },
+      { key: 'height',            label: 'Height'                },
+      { key: 'nativeLanguage',    label: 'Native Language'       },
     ],
   },
+  // ── Passport ─────────────────────────────────────────────────────────────────
   {
-    id: 'passport', title: 'Passport Details',
+    id: 'passport', title: 'Applicant — Passport',
     fields: [
-      { key: 'passportNumber',          label: 'Passport Number'          },
-      { key: 'passportExpiry',          label: 'Passport Expiry'          },
-      { key: 'passportIssuingCountry',  label: 'Passport Issuing Country' },
+      { key: 'passportNumber',         label: 'Passport Number'          },
+      { key: 'passportIssueDate',      label: 'Issue Date'               },
+      { key: 'passportExpiry',         label: 'Expiry Date'              },
+      { key: 'passportIssuingCountry', label: 'Issuing Country'          },
     ],
   },
+  // ── Contact & Address ────────────────────────────────────────────────────────
   {
-    id: 'visa', title: 'Visa Information',
+    id: 'contact', title: 'Applicant — Contact & Address',
     fields: [
-      { key: 'visaNumber',         label: 'Visa Number'         },
-      { key: 'visaType',           label: 'Visa Type'           },
-      { key: 'visaExpiry',         label: 'Visa Expiry'         },
-      { key: 'visaIssuingCountry', label: 'Visa Issuing Country'},
+      { key: 'currentAddress',     label: 'Current Address'       },
+      { key: 'countryOfResidence', label: 'Country of Residence'  },
+      { key: 'phone',              label: 'Phone'                  },
+      { key: 'email',              label: 'Email'                  },
     ],
   },
+  // ── Family ───────────────────────────────────────────────────────────────────
   {
-    id: 'contact', title: 'Contact Information',
-    fields: [
-      { key: 'address',    label: 'Address'        },
-      { key: 'city',       label: 'City'           },
-      { key: 'province',   label: 'Province/State' },
-      { key: 'postalCode', label: 'Postal Code'    },
-      { key: 'phone',      label: 'Phone'          },
-      { key: 'email',      label: 'Email'          },
-    ],
-  },
-  {
-    id: 'license', title: "Driver's License",
-    fields: [
-      { key: 'licenseNumber', label: 'License Number' },
-      { key: 'licenseExpiry', label: 'License Expiry' },
-    ],
-  },
-  {
-    id: 'employment', title: 'Employment',
-    fields: [
-      { key: 'employerName',        label: 'Employer Name'   },
-      { key: 'jobTitle',            label: 'Job Title'       },
-      { key: 'salary',              label: 'Salary'          },
-      { key: 'employmentStartDate', label: 'Employment Start'},
-    ],
-  },
-  {
-    id: 'education', title: 'Education',
-    fields: [
-      { key: 'institution',    label: 'Institution'   },
-      { key: 'degree',         label: 'Degree'        },
-      { key: 'graduationDate', label: 'Graduation'    },
-    ],
-  },
-  {
-    id: 'financial', title: 'Financial',
-    fields: [{ key: 'bankName', label: 'Bank Name' }],
-  },
-  {
-    id: 'family', title: 'Family & Marital Status',
+    id: 'family', title: 'Applicant — Family',
     fields: [
       { key: 'maritalStatus',   label: 'Marital Status'    },
-      { key: 'spouseName',      label: 'Spouse Name'       },
-      { key: 'marriageDate',    label: 'Marriage Date'     },
-      { key: 'marriageLocation',label: 'Marriage Location' },
+      { key: 'dateOfMarriage',  label: 'Date of Marriage'  },
+      { key: 'numberOfChildren',label: 'Number of Children'},
+    ],
+  },
+  // ── Employment ───────────────────────────────────────────────────────────────
+  {
+    id: 'employment', title: 'Applicant — Current Employment',
+    fields: [
+      { key: 'currentOccupation', label: 'Current Occupation' },
+    ],
+  },
+  // ── IELTS ─────────────────────────────────────────────────────────────────────
+  {
+    id: 'ielts', title: 'Language Test — IELTS',
+    fields: [
+      { key: 'ieltsTestDate',   label: 'Test Date'    },
+      { key: 'ieltsResultDate', label: 'Result Date'  },
+      { key: 'ieltsListening',  label: 'Listening'    },
+      { key: 'ieltsReading',    label: 'Reading'      },
+      { key: 'ieltsWriting',    label: 'Writing'      },
+      { key: 'ieltsSpeaking',   label: 'Speaking'     },
+      { key: 'ieltsOverall',    label: 'Overall Band' },
+    ],
+  },
+  // ── CELPIP ────────────────────────────────────────────────────────────────────
+  {
+    id: 'celpip', title: 'Language Test — CELPIP',
+    fields: [
+      { key: 'celpipTestDate',   label: 'Test Date'     },
+      { key: 'celpipResultDate', label: 'Result Date'   },
+      { key: 'celpipListening',  label: 'Listening'     },
+      { key: 'celpipReading',    label: 'Reading'       },
+      { key: 'celpipWriting',    label: 'Writing'       },
+      { key: 'celpipSpeaking',   label: 'Speaking'      },
+      { key: 'celpipOverall',    label: 'Overall Score' },
+    ],
+  },
+  // ── Immigration Status ────────────────────────────────────────────────────────
+  {
+    id: 'immigration', title: 'Immigration & Application',
+    fields: [
+      { key: 'currentStatusInCanada', label: 'Status in Canada' },
+      { key: 'currentStatusExpiry',   label: 'Status Expiry'    },
+      { key: 'courseStartDate',       label: 'Course Start'     },
+      { key: 'courseEndDate',         label: 'Course End'       },
+      { key: 'referredBy',            label: 'Referred By'      },
+    ],
+  },
+  // ── Spouse ───────────────────────────────────────────────────────────────────
+  {
+    id: 'spouse', title: 'Spouse / Partner',
+    fields: [
+      { key: 'spouseFirstName',              label: "First Name"      },
+      { key: 'spouseLastName',               label: "Last Name"       },
+      { key: 'spouseDateOfBirth',            label: "Date of Birth"   },
+      { key: 'spousePlaceOfBirth',           label: "Place of Birth"  },
+      { key: 'spouseCitizenship',            label: "Citizenship"     },
+      { key: 'spousePassportNumber',         label: "Passport No."    },
+      { key: 'spousePassportIssueDate',      label: "Passport Issue"  },
+      { key: 'spousePassportExpiry',         label: "Passport Expiry" },
+      { key: 'spousePassportIssuingCountry', label: "Issuing Country" },
+      { key: 'spouseCurrentOccupation',      label: "Occupation"      },
+    ],
+  },
+  // ── Child 1 ──────────────────────────────────────────────────────────────────
+  {
+    id: 'child1', title: 'Child 1',
+    fields: [
+      { key: 'child1FirstName',              label: 'First Name'      },
+      { key: 'child1LastName',               label: 'Last Name'       },
+      { key: 'child1DateOfBirth',            label: 'Date of Birth'   },
+      { key: 'child1PlaceOfBirth',           label: 'Place of Birth'  },
+      { key: 'child1Citizenship',            label: 'Citizenship'     },
+      { key: 'child1PassportNumber',         label: 'Passport No.'    },
+      { key: 'child1PassportIssueDate',      label: 'Passport Issue'  },
+      { key: 'child1PassportExpiry',         label: 'Passport Expiry' },
+      { key: 'child1PassportIssuingCountry', label: 'Issuing Country' },
+    ],
+  },
+  // ── Child 2 ──────────────────────────────────────────────────────────────────
+  {
+    id: 'child2', title: 'Child 2',
+    fields: [
+      { key: 'child2FirstName',              label: 'First Name'      },
+      { key: 'child2LastName',               label: 'Last Name'       },
+      { key: 'child2DateOfBirth',            label: 'Date of Birth'   },
+      { key: 'child2PlaceOfBirth',           label: 'Place of Birth'  },
+      { key: 'child2Citizenship',            label: 'Citizenship'     },
+      { key: 'child2PassportNumber',         label: 'Passport No.'    },
+      { key: 'child2PassportIssueDate',      label: 'Passport Issue'  },
+      { key: 'child2PassportExpiry',         label: 'Passport Expiry' },
+      { key: 'child2PassportIssuingCountry', label: 'Issuing Country' },
+    ],
+  },
+  // ── Child 3 ──────────────────────────────────────────────────────────────────
+  {
+    id: 'child3', title: 'Child 3',
+    fields: [
+      { key: 'child3FirstName',              label: 'First Name'      },
+      { key: 'child3LastName',               label: 'Last Name'       },
+      { key: 'child3DateOfBirth',            label: 'Date of Birth'   },
+      { key: 'child3PlaceOfBirth',           label: 'Place of Birth'  },
+      { key: 'child3Citizenship',            label: 'Citizenship'     },
+      { key: 'child3PassportNumber',         label: 'Passport No.'    },
+      { key: 'child3PassportIssueDate',      label: 'Passport Issue'  },
+      { key: 'child3PassportExpiry',         label: 'Passport Expiry' },
+      { key: 'child3PassportIssuingCountry', label: 'Issuing Country' },
+    ],
+  },
+  // ── Child 4 ──────────────────────────────────────────────────────────────────
+  {
+    id: 'child4', title: 'Child 4',
+    fields: [
+      { key: 'child4FirstName',              label: 'First Name'      },
+      { key: 'child4LastName',               label: 'Last Name'       },
+      { key: 'child4DateOfBirth',            label: 'Date of Birth'   },
+      { key: 'child4PlaceOfBirth',           label: 'Place of Birth'  },
+      { key: 'child4Citizenship',            label: 'Citizenship'     },
+      { key: 'child4PassportNumber',         label: 'Passport No.'    },
+      { key: 'child4PassportIssueDate',      label: 'Passport Issue'  },
+      { key: 'child4PassportExpiry',         label: 'Passport Expiry' },
+      { key: 'child4PassportIssuingCountry', label: 'Issuing Country' },
     ],
   },
 ];

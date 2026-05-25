@@ -50,7 +50,7 @@ export default function IntakeForm() {
                 <div
                   key={field.id}
                   className={field.type === 'text' && (
-                    field.id === 'address' || field.id === 'employerName' || field.id === 'institution'
+                    field.id === 'currentAddress' || field.id === 'currentOccupation' || field.id === 'spouseCurrentOccupation'
                   ) ? 'sm:col-span-2' : ''}
                 >
                   <FormField field={field} />
