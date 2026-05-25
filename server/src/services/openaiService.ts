@@ -258,6 +258,7 @@ const EXTRACT_FIELDS: Record<DocumentId, FieldSpec[]> = {
     { key: 'passportIssueDate',    desc: 'Date of issue (YYYY-MM-DD)'                       },
     { key: 'passportExpiry',       desc: 'Expiry / expiration date (YYYY-MM-DD)'            },
     { key: 'passportIssuingCountry', desc: 'Country that issued the passport'               },
+    { key: 'currentAddress',       desc: 'Full residential address if printed in the passport (some passports include an address page — include flat/house number, street, city, pincode/postal code). Leave empty if no address is present.' },
   ],
 
   marriageCertificate: [

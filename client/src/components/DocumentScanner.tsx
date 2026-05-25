@@ -244,7 +244,7 @@ export default function DocumentScanner() {
             <li>For each document, click <strong>Scan</strong> (camera) or <strong>Upload</strong> (file)</li>
             <li>Scan: place document in frame, capture, then tap Done</li>
             <li>Upload: select image/PDF (max 1 MB per file, 22 MB total)</li>
-            <li>AI will automatically fill in your information</li>
+            <li>Your information will be automatically extracted from the documents</li>
           </ol>
         </div>
       )}

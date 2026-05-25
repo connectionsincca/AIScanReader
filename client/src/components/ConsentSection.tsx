@@ -12,7 +12,7 @@ const CHECKBOXES: { key: keyof ConsentState; label: string }[] = [
   },
   {
     key: 'aiAssisted',
-    label: 'I consent to AI-assisted processing to extract information from my documents.',
+    label: 'I consent to automated data extraction to extract information from my documents.',
   },
   {
     key: 'submission',

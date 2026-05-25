@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import ProgressSteps from './components/ProgressSteps';
 import ConsentSection from './components/ConsentSection';
@@ -8,6 +9,11 @@ import SuccessScreen from './components/SuccessScreen';
 
 function Portal() {
   const { state } = useApp();
+
+  // Scroll to top whenever the step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [state.step]);
 
   if (state.step === 'complete') return <SuccessScreen />;
 
