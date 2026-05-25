@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import type { DocumentConfig, DocumentId, PageData } from '../types';
 import { dataUrlToBase64, analyzeImageQuality, estimateSizeBytes, formatFileSize } from '../utils/imageAnalysis';
 import { extractData, validateScan } from '../utils/api';
+import { pdfToImages } from '../utils/pdfUtils';
 import { MAX_PAGE_BYTES, MAX_TOTAL_BYTES } from '../config/limits';
 import CameraModal from './CameraModal';
 import PageGallery from './PageGallery';
@@ -132,7 +133,10 @@ export default function DocumentRow({ doc, disabled, dynamicRequired }: Props) {
     setActionMsg(null);
     setUploading(true);
 
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
     try {
+      // ── Size check (1 MB per file, image or PDF) ────────────────────────────
       if (file.size > MAX_PAGE_BYTES) {
         setActionMsg({ type: 'error', text: `File too large (${formatFileSize(file.size)}). Maximum size per file is 1 MB.` });
         return;
@@ -145,24 +149,55 @@ export default function DocumentRow({ doc, disabled, dynamicRequired }: Props) {
         return;
       }
 
-      const dataUrl = await readFileAsDataUrl(file);
-
-      try {
-        const quality = await analyzeImageQuality(dataUrl);
-        if (quality.isBlurry) {
-          setActionMsg({ type: 'error', text: 'Uploaded image appears blurry. Please upload a clearer photo or use the camera scan option.' });
+      // ── Convert to data URLs (one per page) ─────────────────────────────────
+      let dataUrls: string[];
+      if (isPdf) {
+        setActionMsg({ type: 'info', text: 'Converting PDF pages…' });
+        try {
+          dataUrls = await pdfToImages(file);
+        } catch (err) {
+          setActionMsg({ type: 'error', text: `Could not read PDF: ${(err as Error).message ?? 'Unknown error'}. Try a different file.` });
           return;
         }
-        if (quality.isDark) {
-          setActionMsg({ type: 'error', text: 'Uploaded image is too dark. Please upload a better-lit photo.' });
+        if (dataUrls.length === 0) {
+          setActionMsg({ type: 'error', text: 'PDF appears to be empty or could not be rendered.' });
           return;
         }
-      } catch { /* unsupported format — continue */ }
+        setActionMsg(null);
+      } else {
+        // Single image
+        const dataUrl = await readFileAsDataUrl(file);
 
+        // Quality check (blur / darkness) — images only
+        try {
+          const quality = await analyzeImageQuality(dataUrl);
+          if (quality.isBlurry) {
+            setActionMsg({ type: 'error', text: 'Uploaded image appears blurry. Please upload a clearer photo or use the camera scan option.' });
+            return;
+          }
+          if (quality.isDark) {
+            setActionMsg({ type: 'error', text: 'Uploaded image is too dark. Please upload a better-lit photo.' });
+            return;
+          }
+        } catch { /* unsupported format — continue */ }
+
+        dataUrls = [dataUrl];
+      }
+
+      // ── Per-page size check (after rendering) ────────────────────────────────
+      for (const url of dataUrls) {
+        const sz = estimateSizeBytes(url);
+        if (sz > MAX_PAGE_BYTES) {
+          setActionMsg({ type: 'error', text: `A page in this file is too large (${formatFileSize(sz)}) after rendering. Max 1 MB per page — try a lower-resolution scan.` });
+          return;
+        }
+      }
+
+      // ── Document-type validation (first page only) ───────────────────────────
       setDocumentStatus(doc.id, 'processing');
       let skipped = false;
       try {
-        const validation = await validateScan({ documentId: doc.id, imageBase64: dataUrlToBase64(dataUrl) });
+        const validation = await validateScan({ documentId: doc.id, imageBase64: dataUrlToBase64(dataUrls[0]) });
         if (!validation.valid) {
           setDocumentStatus(doc.id, 'idle');
           setActionMsg({ type: 'error', text: validation.message || `Wrong document type. Please upload the correct document: "${doc.name}".` });
@@ -179,16 +214,16 @@ export default function DocumentRow({ doc, disabled, dynamicRequired }: Props) {
         setActionMsg(null);
       }
 
-      const sizeBytes = estimateSizeBytes(dataUrl);
-      const page: PageData = {
+      // ── Build PageData objects and add ───────────────────────────────────────
+      const newPages: PageData[] = dataUrls.map((url) => ({
         id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-        dataUrl,
+        dataUrl: url,
         capturedAt: Date.now(),
-        sizeBytes,
-      };
+        sizeBytes: estimateSizeBytes(url),
+      }));
 
-      addPages(doc.id, [page]);
-      processPages([...docState.pages, page]);
+      addPages(doc.id, newPages);
+      processPages([...docState.pages, ...newPages]);
 
     } catch (err) {
       setDocumentStatus(doc.id, 'idle');
@@ -245,11 +280,11 @@ export default function DocumentRow({ doc, disabled, dynamicRequired }: Props) {
 
   return (
     <>
-      {/* Hidden file input */}
+      {/* Hidden file input — accepts images and PDFs */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,application/pdf,.pdf"
         className="hidden"
         onChange={handleFileSelect}
       />
@@ -361,7 +396,7 @@ export default function DocumentRow({ doc, disabled, dynamicRequired }: Props) {
               onClick={() => { if (!disabled) { setActionMsg(null); fileInputRef.current?.click(); } }}
               disabled={disabled}
               className="btn-secondary text-sm py-2 px-3"
-              title="Upload from file (JPG, PNG, WEBP, HEIC)"
+              title="Upload from file (JPG, PNG, WEBP, HEIC, PDF)"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

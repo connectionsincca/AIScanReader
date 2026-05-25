@@ -243,7 +243,7 @@ export default function DocumentScanner() {
             <li>Declare all travelers joining this application below</li>
             <li>For each document, click <strong>Scan</strong> (camera) or <strong>Upload</strong> (file)</li>
             <li>Scan: place document in frame, capture, then tap Done</li>
-            <li>Upload: select a clear JPG / PNG / WEBP image — max 1 MB per file, 22 MB total</li>
+            <li>Upload: select image/PDF (max 1 MB per file, 22 MB total)</li>
             <li>AI will automatically fill in your information</li>
           </ol>
         </div>
