@@ -11,16 +11,20 @@ const STEPS: { id: AppStep; label: string; short: string }[] = [
 const STEP_ORDER: AppStep[] = ['consent', 'scanning', 'form', 'complete'];
 
 export default function ProgressSteps() {
-  const { state } = useApp();
+  const { state, setStep } = useApp();
   const currentIndex = STEP_ORDER.indexOf(state.step);
+
+  // Back is available on scanning (1) and form (2) only — not on consent or complete
+  const canGoBack = currentIndex > 0 && currentIndex < STEP_ORDER.length - 1;
+  const prevStep  = canGoBack ? STEP_ORDER[currentIndex - 1] : null;
 
   return (
     <div className="card px-4 py-3">
+      {/* Step indicator */}
       <div className="flex items-center justify-between">
         {STEPS.map((step, i) => {
-          const done    = i < currentIndex;
-          const active  = i === currentIndex;
-          const pending = i > currentIndex;
+          const done   = i < currentIndex;
+          const active = i === currentIndex;
 
           return (
             <div key={step.id} className="flex items-center flex-1">
@@ -58,6 +62,21 @@ export default function ProgressSteps() {
           );
         })}
       </div>
+
+      {/* Previous button — shown on scanning and form steps */}
+      {canGoBack && prevStep && (
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <button
+            onClick={() => setStep(prevStep)}
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to {STEPS[currentIndex - 1].label}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
