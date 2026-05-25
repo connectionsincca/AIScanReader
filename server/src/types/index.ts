@@ -169,6 +169,23 @@ export interface FormData {
   numberOfChildren:        string;
   courseStartDate:         string;
   courseEndDate:           string;
+
+  // ── Page 1 — additional manual entry fields ──────────────────────────────
+  entryCategory:            string;  // Visitor / Refugee / Student / Worker
+  uciNumber:                string;
+  dateFirstEnteredCanada:   string;
+  portOfEntry:              string;
+  deportedFlag:             string;  // 'yes' | 'no'
+  deportedDetails:          string;
+  irccAppliedBefore:        string;  // 'yes' | 'no'
+  pnpAppliedBefore:         string;  // 'yes' | 'no'
+  hasRelativeInCanada:      string;  // 'yes' | 'no'
+  highestEducationCanadian: string;
+  totalYearsEducation:      string;
+
+  // ── Page 7 — Canada entry dates ─────────────────────────────────────────
+  dateEntryCanada:          string;
+  dateRecentEntryCanada:    string;
 }
 
 // ─── API request / response types ─────────────────────────────────────────────

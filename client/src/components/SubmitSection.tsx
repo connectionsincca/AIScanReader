@@ -1,32 +1,41 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { DOCUMENTS } from '../config/documents';
-import { FORM_SECTIONS } from '../config/formFields';
 import { dataUrlToBase64 } from '../utils/imageAnalysis';
 import { submitPackage } from '../utils/api';
 import type { FormData } from '../types';
 
-const REQUIRED_FIELD_IDS = FORM_SECTIONS.flatMap((s) =>
-  s.fields.filter((f) => f.required).map((f) => f.id)
-) as Array<keyof FormData>;
+const BASE_REQUIRED: Array<keyof FormData> = [
+  'firstName', 'lastName',
+  'passportNumber', 'passportIssuingCountry', 'passportIssueDate', 'passportExpiry',
+  'dateOfBirth', 'cityOfBirth', 'countryOfBirth', 'citizenship',
+  'currentAddress', 'countryOfResidence',
+  'phone', 'email', 'maritalStatus',
+];
 
 export default function SubmitSection() {
-  const { state, setSubmitting, setStep, setSubmitError } = useApp();
+  const { state, setSubmitting, setStep, setSubmitError, travelers, setSubmitAttempted } = useApp();
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Validate required fields
-  const missingFields = REQUIRED_FIELD_IDS.filter(
-    (id) => !state.formData[id]?.trim()
-  );
+  const requiredKeys = useMemo<Set<keyof FormData>>(() => {
+    const s = new Set<keyof FormData>(BASE_REQUIRED);
+    if (travelers.hasSpouse) {
+      (['spouseLastName', 'spouseFirstName', 'spouseDateOfBirth', 'spousePassportNumber'] as Array<keyof FormData>).forEach((k) => s.add(k));
+    }
+    for (let i = 1; i <= travelers.childCount; i++) {
+      ([`child${i}LastName`, `child${i}FirstName`, `child${i}DateOfBirth`, `child${i}PassportNumber`] as Array<keyof FormData>).forEach((k) => s.add(k));
+    }
+    return s;
+  }, [travelers]);
+
+  const missingFields = [...requiredKeys].filter((id) => !state.formData[id]?.trim());
 
   const handleSubmit = async () => {
     setLocalError(null);
 
     if (missingFields.length > 0) {
-      const labels = FORM_SECTIONS.flatMap((s) => s.fields)
-        .filter((f) => missingFields.includes(f.id as keyof FormData))
-        .map((f) => f.label);
-      setLocalError(`Please complete the following required fields: ${labels.join(', ')}.`);
+      setSubmitAttempted(true);
+      setLocalError(`Please complete highlighted fields in the form above before submitting. ${missingFields.length} field${missingFields.length !== 1 ? 's' : ''} missing.`);
       return;
     }
 

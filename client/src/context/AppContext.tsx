@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import type {
   AppState, AppStep, ConsentState, DocumentId, DocumentState,
-  DocumentStatus, FormData, PageData,
+  DocumentStatus, FormData, PageData, TravelerState,
 } from '../types';
 import { DOCUMENTS } from '../config/documents';
 
@@ -22,6 +22,8 @@ const INITIAL_STATE: AppState = {
   submissionId: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36),
   submitting: false,
   submitError: null,
+  travelers: { hasSpouse: false, childCount: 0 },
+  submitAttempted: false,
 };
 
 // ─── Actions ───────────────────────────────────────────────────────────────────
@@ -36,7 +38,9 @@ type Action =
   | { type: 'APPLY_EXTRACTED'; documentId: DocumentId; extractedData: Partial<FormData>; confidence: Partial<Record<keyof FormData, number>> }
   | { type: 'SET_FORM_FIELD'; field: keyof FormData; value: string }
   | { type: 'SET_SUBMITTING'; value: boolean }
-  | { type: 'SET_SUBMIT_ERROR'; error: string | null };
+  | { type: 'SET_SUBMIT_ERROR'; error: string | null }
+  | { type: 'SET_TRAVELERS'; travelers: TravelerState }
+  | { type: 'SET_SUBMIT_ATTEMPTED'; value: boolean };
 
 // ─── Reducer ───────────────────────────────────────────────────────────────────
 
@@ -140,6 +144,12 @@ function reducer(state: AppState, action: Action): AppState {
     case 'SET_SUBMIT_ERROR':
       return { ...state, submitError: action.error };
 
+    case 'SET_TRAVELERS':
+      return { ...state, travelers: action.travelers };
+
+    case 'SET_SUBMIT_ATTEMPTED':
+      return { ...state, submitAttempted: action.value };
+
     default:
       return state;
   }
@@ -164,6 +174,9 @@ interface AppContextValue {
   setFormField: (field: keyof FormData, value: string) => void;
   setSubmitting: (value: boolean) => void;
   setSubmitError: (error: string | null) => void;
+  travelers: TravelerState;
+  setTravelers: (t: TravelerState) => void;
+  setSubmitAttempted: (value: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -210,11 +223,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const setSubmitError = useCallback((error: string | null) =>
     dispatch({ type: 'SET_SUBMIT_ERROR', error }), []);
 
+  const setTravelers = useCallback((travelers: TravelerState) =>
+    dispatch({ type: 'SET_TRAVELERS', travelers }), []);
+
+  const setSubmitAttempted = useCallback((value: boolean) =>
+    dispatch({ type: 'SET_SUBMIT_ATTEMPTED', value }), []);
+
   return (
     <AppContext.Provider value={{
       state, setConsent, consentComplete, setStep,
       addPages, removePage, resetDocument, setDocumentStatus,
       applyExtracted, setFormField, setSubmitting, setSubmitError,
+      travelers: state.travelers, setTravelers, setSubmitAttempted,
     }}>
       {children}
     </AppContext.Provider>
