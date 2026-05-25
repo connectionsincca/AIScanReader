@@ -10,6 +10,8 @@ import PageGallery from './PageGallery';
 interface Props {
   doc: DocumentConfig;
   disabled: boolean;
+  /** Overrides doc.required for badge/hint display (computed dynamically from form data) */
+  dynamicRequired?: boolean;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -31,7 +33,7 @@ function totalDocumentBytes(documents: ReturnType<typeof useApp>['state']['docum
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function DocumentRow({ doc, disabled }: Props) {
+export default function DocumentRow({ doc, disabled, dynamicRequired }: Props) {
   const { state, addPages, removePage, resetDocument, setDocumentStatus, applyExtracted } = useApp();
   const docState = state.documents[doc.id];
 
@@ -40,11 +42,21 @@ export default function DocumentRow({ doc, disabled }: Props) {
   const [cameraOpen,   setCameraOpen]   = useState(false);
   const [galleryOpen,  setGalleryOpen]  = useState(false);
   const [uploading,    setUploading]    = useState(false);
-  const [actionError,  setActionError]  = useState<string | null>(null);
+  const [actionMsg,    setActionMsg]    = useState<{ text: string; type: 'error' | 'info' | 'warning' } | null>(null);
 
   const pageCount  = docState.pages.length;
   const status     = docState.status;
   const docBytes   = docState.pages.reduce((s, p) => s + (p.sizeBytes ?? 0), 0);
+
+  // Effective required: dynamic override takes precedence if provided
+  const isRequired = dynamicRequired !== undefined ? dynamicRequired : doc.required;
+
+  // ── Special: address proof — can reuse existing passport scan ─────────────
+
+  const isAddressProof   = doc.id === 'addressProof';
+  const passportState    = state.documents['passport' as DocumentId];
+  const passportDone     = passportState?.status === 'done';
+  const passportPages    = passportState?.pages ?? [];
 
   // ── Process pages with OCR ──────────────────────────────────────────────────
 
@@ -66,25 +78,24 @@ export default function DocumentRow({ doc, disabled }: Props) {
   // ── Camera callbacks ────────────────────────────────────────────────────────
 
   const handlePagesAdded = useCallback((newPages: PageData[]) => {
-    // Total-size guardrail (per-page was already checked inside CameraModal)
     const currentTotal = totalDocumentBytes(state.documents);
     const addedTotal   = newPages.reduce((s, p) => s + (p.sizeBytes ?? 0), 0);
     if (currentTotal + addedTotal > MAX_TOTAL_BYTES) {
       const avail = Math.max(0, MAX_TOTAL_BYTES - currentTotal);
-      setActionError(
-        `Total document limit (22 MB) reached. ` +
-        `Available: ${formatFileSize(avail)}, scanned: ${formatFileSize(addedTotal)}.`
-      );
+      setActionMsg({
+        type: 'error',
+        text: `Total document limit (22 MB) reached. Available: ${formatFileSize(avail)}, scanned: ${formatFileSize(addedTotal)}.`,
+      });
       return;
     }
-    setActionError(null);
+    setActionMsg(null);
     addPages(doc.id, newPages);
     const all = [...docState.pages, ...newPages];
     processPages(all);
   }, [state.documents, addPages, doc.id, docState.pages, processPages]);
 
   const handleReset = useCallback(() => {
-    setActionError(null);
+    setActionMsg(null);
     resetDocument(doc.id);
   }, [doc.id, resetDocument]);
 
@@ -93,90 +104,81 @@ export default function DocumentRow({ doc, disabled }: Props) {
     if (pageCount - 1 === 0) resetDocument(doc.id);
   }, [doc.id, pageCount, removePage, resetDocument]);
 
+  // ── Use Passport as Address Proof ──────────────────────────────────────────
+
+  const handleUsePassport = useCallback(() => {
+    if (!passportDone || passportPages.length === 0) return;
+    // Clone passport pages with fresh IDs so they live independently
+    const cloned: PageData[] = passportPages.map((p) => ({
+      ...p,
+      id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
+    }));
+    addPages(doc.id, cloned);
+    // Mark done without re-running OCR — passport data is already extracted
+    setDocumentStatus(doc.id, 'done');
+    setActionMsg({
+      type: 'info',
+      text: 'Scanned passport is being used as address proof. Please enter your current address manually in the form below.',
+    });
+  }, [passportDone, passportPages, addPages, doc.id, setDocumentStatus]);
+
   // ── File Upload ─────────────────────────────────────────────────────────────
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    e.target.value = ''; // allow re-selecting same file
+    e.target.value = '';
     if (!file || disabled) return;
 
-    setActionError(null);
+    setActionMsg(null);
     setUploading(true);
 
     try {
-      // 1. Per-file size check
       if (file.size > MAX_PAGE_BYTES) {
-        setActionError(
-          `File too large (${formatFileSize(file.size)}). Maximum size per file is 1 MB.`
-        );
+        setActionMsg({ type: 'error', text: `File too large (${formatFileSize(file.size)}). Maximum size per file is 1 MB.` });
         return;
       }
 
-      // 2. Total size check (use file.size as the estimate before reading)
       const currentTotal = totalDocumentBytes(state.documents);
       if (currentTotal + file.size > MAX_TOTAL_BYTES) {
         const avail = Math.max(0, MAX_TOTAL_BYTES - currentTotal);
-        setActionError(
-          `Total document limit (22 MB) reached. ` +
-          `Available: ${formatFileSize(avail)}, file: ${formatFileSize(file.size)}.`
-        );
+        setActionMsg({ type: 'error', text: `Total document limit (22 MB) reached. Available: ${formatFileSize(avail)}, file: ${formatFileSize(file.size)}.` });
         return;
       }
 
-      // 3. Read as data URL
       const dataUrl = await readFileAsDataUrl(file);
 
-      // 4. Image quality check (blur / darkness)
       try {
         const quality = await analyzeImageQuality(dataUrl);
         if (quality.isBlurry) {
-          setActionError(
-            'Uploaded image appears blurry. Please upload a clearer photo or use the camera scan option.'
-          );
+          setActionMsg({ type: 'error', text: 'Uploaded image appears blurry. Please upload a clearer photo or use the camera scan option.' });
           return;
         }
         if (quality.isDark) {
-          setActionError(
-            'Uploaded image is too dark. Please upload a better-lit photo.'
-          );
+          setActionMsg({ type: 'error', text: 'Uploaded image is too dark. Please upload a better-lit photo.' });
           return;
         }
-      } catch {
-        // If quality analysis fails (e.g. unsupported format), continue anyway
-      }
+      } catch { /* unsupported format — continue */ }
 
-      // 5. Document-type validation via AI
       setDocumentStatus(doc.id, 'processing');
       let skipped = false;
       try {
-        const validation = await validateScan({
-          documentId: doc.id,
-          imageBase64: dataUrlToBase64(dataUrl),
-        });
+        const validation = await validateScan({ documentId: doc.id, imageBase64: dataUrlToBase64(dataUrl) });
         if (!validation.valid) {
           setDocumentStatus(doc.id, 'idle');
-          setActionError(
-            validation.message ||
-            `Wrong document type. Please upload the correct document: "${doc.name}".`
-          );
+          setActionMsg({ type: 'error', text: validation.message || `Wrong document type. Please upload the correct document: "${doc.name}".` });
           return;
         }
         skipped = !!validation.validationSkipped;
       } catch {
-        skipped = true; // network error → fail-open (same behaviour as camera)
+        skipped = true;
       }
 
       if (skipped) {
-        setActionError(
-          '⚠ Document type could not be verified (AI service unavailable). ' +
-          'Please ensure you are uploading the correct document.'
-        );
-        // Still continue — fail-open mirrors camera's "Use Anyway" path
+        setActionMsg({ type: 'warning', text: '⚠ Document type could not be verified (AI service unavailable). Please ensure you are uploading the correct document.' });
       } else {
-        setActionError(null);
+        setActionMsg(null);
       }
 
-      // 6. Add page + extract data
       const sizeBytes = estimateSizeBytes(dataUrl);
       const page: PageData = {
         id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
@@ -190,19 +192,18 @@ export default function DocumentRow({ doc, disabled }: Props) {
 
     } catch (err) {
       setDocumentStatus(doc.id, 'idle');
-      setActionError(`Upload failed: ${(err as Error).message ?? 'Unknown error'}`);
+      setActionMsg({ type: 'error', text: `Upload failed: ${(err as Error).message ?? 'Unknown error'}` });
     } finally {
       setUploading(false);
     }
-  }, [disabled, state.documents, doc.id, doc.name, addPages, docState.pages,
-      processPages, setDocumentStatus]);
+  }, [disabled, state.documents, doc.id, doc.name, addPages, docState.pages, processPages, setDocumentStatus]);
 
   // ── Status badge ────────────────────────────────────────────────────────────
 
   const badge = () => {
     switch (status) {
       case 'idle':
-        return doc.required
+        return isRequired
           ? <span className="badge-warning">Required</span>
           : <span className="badge-neutral">Optional</span>;
       case 'processing':
@@ -228,6 +229,20 @@ export default function DocumentRow({ doc, disabled }: Props) {
 
   const isProcessing = status === 'processing' || uploading;
 
+  // ── Education affidavit note (degree cert only) ─────────────────────────────
+
+  const showAffidavitNote = doc.id === 'degreeCertificate' && pageCount === 0 && (() => {
+    try {
+      const entries = JSON.parse(state.formData.educationHistory ?? '[]') as Array<{ certificate?: string }>;
+      const highSchoolKeywords = ['high school', 'secondary', '10th', '12th', 'hsc', 'ssc', 'matric'];
+      const hasHigher = entries.some((e) => {
+        const cert = (e.certificate ?? '').toLowerCase();
+        return cert.length > 0 && !highSchoolKeywords.some((k) => cert.includes(k));
+      });
+      return !hasHigher; // no higher education claimed → show affidavit option
+    } catch { return true; }
+  })();
+
   return (
     <>
       {/* Hidden file input */}
@@ -239,15 +254,15 @@ export default function DocumentRow({ doc, disabled }: Props) {
         onChange={handleFileSelect}
       />
 
-      <div className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border transition-colors
+      <div className={`flex flex-col sm:flex-row sm:items-start gap-3 p-4 rounded-xl border transition-colors
         ${status === 'done'       ? 'border-green-200 bg-green-50/30'
         : status === 'processing' ? 'border-blue-100 bg-blue-50/20'
         : status === 'error'      ? 'border-red-200 bg-red-50/20'
         : 'border-gray-100 bg-white hover:border-gray-200'}`}
       >
         {/* Icon + info */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5
             ${status === 'done' ? 'bg-green-100' : status === 'error' ? 'bg-red-100' : 'bg-gray-100'}`}
           >
             {status === 'done' ? (
@@ -263,39 +278,71 @@ export default function DocumentRow({ doc, disabled }: Props) {
             )}
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-gray-900 text-sm">{doc.name}</span>
               {badge()}
               {pageCount > 0 && (
                 <span className="text-xs text-gray-500">
                   {pageCount} page{pageCount !== 1 ? 's' : ''}
-                  {docBytes > 0 && (
-                    <span className="ml-1 text-gray-400">· {formatFileSize(docBytes)}</span>
-                  )}
+                  {docBytes > 0 && <span className="ml-1 text-gray-400">· {formatFileSize(docBytes)}</span>}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500 truncate mt-0.5">{doc.description}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{doc.description}</p>
 
             {/* OCR extraction error */}
             {status === 'error' && docState.errorMessage && (
               <p className="text-xs text-red-600 mt-1">{docState.errorMessage}</p>
             )}
-            {/* Upload / scan action error */}
-            {actionError && (
-              <p className="text-xs text-red-600 mt-1">{actionError}</p>
+
+            {/* Action message (error / warning / info) */}
+            {actionMsg && (
+              <p className={`text-xs mt-1 ${
+                actionMsg.type === 'error'   ? 'text-red-600'    :
+                actionMsg.type === 'warning' ? 'text-amber-700'  :
+                                               'text-blue-700'
+              }`}>
+                {actionMsg.text}
+              </p>
+            )}
+
+            {/* Degree cert: no-formal-education affidavit note */}
+            {showAffidavitNote && (
+              <div className="mt-2 flex items-start gap-1.5 bg-amber-50 border border-dashed border-amber-300 rounded-lg px-2.5 py-2 text-xs text-amber-800 leading-snug">
+                <span className="flex-shrink-0">📄</span>
+                <span>
+                  <strong>No formal education above high school?</strong> Upload a notarized letter of
+                  explanation instead. The letter should state the applicant's lack of formal schooling,
+                  current daily activities, and strong ties to home country.
+                </span>
+              </div>
+            )}
+
+            {/* Address proof: use existing passport option */}
+            {isAddressProof && pageCount === 0 && passportDone && (
+              <div className="mt-2 flex items-center gap-2 bg-blue-50 border border-dashed border-blue-300 rounded-lg px-2.5 py-2">
+                <span className="text-xs text-blue-700 flex-1">
+                  Your passport is already scanned — you can use it as address proof.
+                </span>
+                <button
+                  onClick={handleUsePassport}
+                  disabled={disabled}
+                  className="flex-shrink-0 text-xs bg-blue-600 text-white px-2.5 py-1 rounded-lg hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
+                >
+                  Use Passport
+                </button>
+              </div>
             )}
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
 
-          {/* Scan button */}
           {!isProcessing && (
             <button
-              onClick={() => { if (!disabled) { setActionError(null); setCameraOpen(true); } }}
+              onClick={() => { if (!disabled) { setActionMsg(null); setCameraOpen(true); } }}
               disabled={disabled}
               className={pageCount === 0 ? 'btn-primary text-sm py-2 px-3' : 'btn-secondary text-sm py-2 px-3'}
               title="Scan with camera"
@@ -309,10 +356,9 @@ export default function DocumentRow({ doc, disabled }: Props) {
             </button>
           )}
 
-          {/* Upload button */}
           {!isProcessing && (
             <button
-              onClick={() => { if (!disabled) { setActionError(null); fileInputRef.current?.click(); } }}
+              onClick={() => { if (!disabled) { setActionMsg(null); fileInputRef.current?.click(); } }}
               disabled={disabled}
               className="btn-secondary text-sm py-2 px-3"
               title="Upload from file (JPG, PNG, WEBP, HEIC)"
@@ -325,7 +371,6 @@ export default function DocumentRow({ doc, disabled }: Props) {
             </button>
           )}
 
-          {/* Uploading spinner */}
           {uploading && (
             <span className="flex items-center gap-1.5 text-sm text-blue-600 px-2">
               <span className="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin flex-shrink-0" />
@@ -333,7 +378,6 @@ export default function DocumentRow({ doc, disabled }: Props) {
             </span>
           )}
 
-          {/* View pages */}
           {pageCount > 0 && (
             <button onClick={() => setGalleryOpen(true)} className="btn-ghost text-sm">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +388,6 @@ export default function DocumentRow({ doc, disabled }: Props) {
             </button>
           )}
 
-          {/* Remove all */}
           {pageCount > 0 && !isProcessing && (
             <button
               onClick={handleReset}
@@ -360,7 +403,6 @@ export default function DocumentRow({ doc, disabled }: Props) {
         </div>
       </div>
 
-      {/* Camera modal */}
       {cameraOpen && (
         <CameraModal
           documentId={doc.id}
@@ -372,7 +414,6 @@ export default function DocumentRow({ doc, disabled }: Props) {
         />
       )}
 
-      {/* Page gallery */}
       {galleryOpen && (
         <PageGallery
           documentName={doc.name}

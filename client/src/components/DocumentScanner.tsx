@@ -91,10 +91,12 @@ function TravelerCard({
   section,
   disabled,
   defaultOpen = false,
+  requiredOverrides = {},
 }: {
   section: TravelerSection;
   disabled: boolean;
   defaultOpen?: boolean;
+  requiredOverrides?: Partial<Record<DocumentId, boolean>>;
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
@@ -128,7 +130,14 @@ function TravelerCard({
                 {group.docIds.map((id) => {
                   const doc = DOCUMENT_MAP[id];
                   if (!doc) return null;
-                  return <DocumentRow key={id} doc={doc} disabled={disabled} />;
+                  return (
+                    <DocumentRow
+                      key={id}
+                      doc={doc}
+                      disabled={disabled}
+                      dynamicRequired={requiredOverrides[id]}
+                    />
+                  );
                 })}
               </div>
             </div>
@@ -148,6 +157,28 @@ export default function DocumentScanner() {
 
   // Count all processed docs
   const processedCount = Object.values(state.documents).filter((d) => d.status === 'done').length;
+
+  // Dynamic required overrides based on form data already filled in
+  const highSchoolOnly = ['high school', 'secondary', '10th', '12th', 'hsc', 'ssc', 'matric', 'nil', 'none'];
+  const hasWorkEntries = (() => {
+    try { return (JSON.parse(state.formData.workHistory ?? '[]') as unknown[]).length > 0; }
+    catch { return false; }
+  })();
+  const hasHigherEdu = (() => {
+    try {
+      return (JSON.parse(state.formData.educationHistory ?? '[]') as Array<{ certificate?: string }>)
+        .some((e) => {
+          const cert = (e.certificate ?? '').toLowerCase();
+          return cert.length > 0 && !highSchoolOnly.some((k) => cert.includes(k));
+        });
+    } catch { return false; }
+  })();
+
+  // Overrides passed to Applicant's TravelerCard
+  const applicantOverrides: Partial<Record<DocumentId, boolean>> = {
+    workExperienceCert: hasWorkEntries,   // required only if employment history filled
+    degreeCertificate:  hasHigherEdu,     // required only if higher education claimed
+  };
 
   // Total bytes across all document pages
   const totalBytes = Object.values(state.documents)
@@ -266,7 +297,7 @@ export default function DocumentScanner() {
         </p>
 
         {/* Applicant */}
-        <TravelerCard section={APPLICANT_SECTION} disabled={isLocked} defaultOpen={true} />
+        <TravelerCard section={APPLICANT_SECTION} disabled={isLocked} defaultOpen={true} requiredOverrides={applicantOverrides} />
 
         {/* Spouse */}
         {travelers.hasSpouse && (

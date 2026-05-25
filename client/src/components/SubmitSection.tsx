@@ -30,12 +30,82 @@ export default function SubmitSection() {
 
   const missingFields = [...requiredKeys].filter((id) => !state.formData[id]?.trim());
 
+  // ── Cross-check: proof documents vs. manually entered data ─────────────────
+
+  const highSchoolOnly = ['high school', 'secondary', '10th', '12th', 'hsc', 'ssc', 'matric', 'nil', 'none'];
+
+  const workEntries = (() => {
+    try { return JSON.parse(state.formData.workHistory ?? '[]') as unknown[]; }
+    catch { return []; }
+  })();
+
+  const eduEntries = (() => {
+    try { return JSON.parse(state.formData.educationHistory ?? '[]') as Array<{ certificate?: string }>; }
+    catch { return []; }
+  })();
+
+  const hasHigherEdu = eduEntries.some((e) => {
+    const cert = (e.certificate ?? '').toLowerCase();
+    return cert.length > 0 && !highSchoolOnly.some((k) => cert.includes(k));
+  });
+
+  type CrossWarn = { blocking: boolean; message: string };
+  const crossWarnings: CrossWarn[] = [];
+
+  // Spouse passport missing but spouse data filled
+  const spouseNameFilled = !!(state.formData.spouseFirstName?.trim() || state.formData.spouseLastName?.trim());
+  if (spouseNameFilled && state.documents['spousePassport' as const].pages.length === 0) {
+    crossWarnings.push({
+      blocking: true,
+      message: "You've entered spouse details but haven't scanned/uploaded the spouse's passport. Please go back to Document Scanning and upload it.",
+    });
+  }
+
+  // Child passports missing when child data filled
+  for (let n = 1; n <= 4; n++) {
+    const fn = `child${n}FirstName` as keyof typeof state.formData;
+    const ln = `child${n}LastName`  as keyof typeof state.formData;
+    const passportId = `child${n}Passport` as 'child1Passport' | 'child2Passport' | 'child3Passport' | 'child4Passport';
+    const childFilled = !!(state.formData[fn]?.trim() || state.formData[ln]?.trim());
+    const childPassportDone = state.documents[passportId].pages.length > 0;
+    if (childFilled && !childPassportDone) {
+      crossWarnings.push({
+        blocking: true,
+        message: `You've entered Child ${n} details but haven't scanned/uploaded Child ${n}'s passport. Please go back to Document Scanning and upload it.`,
+      });
+    }
+  }
+
+  // Work proof missing but employment history filled
+  if (workEntries.length > 0 && state.documents['workExperienceCert'].pages.length === 0) {
+    crossWarnings.push({
+      blocking: false,
+      message: "You've entered employment history but haven't uploaded any Work Experience Certificates. Uploading proof strengthens your application.",
+    });
+  }
+
+  // Education proof missing but higher education claimed
+  if (hasHigherEdu && state.documents['degreeCertificate'].pages.length === 0) {
+    crossWarnings.push({
+      blocking: false,
+      message: "You've entered post-secondary education but haven't uploaded any Degree/Diploma Certificates. Uploading proof is strongly recommended.",
+    });
+  }
+
+  const blockingWarnings  = crossWarnings.filter((w) => w.blocking);
+  const advisoryWarnings  = crossWarnings.filter((w) => !w.blocking);
+
   const handleSubmit = async () => {
     setLocalError(null);
 
     if (missingFields.length > 0) {
       setSubmitAttempted(true);
       setLocalError(`Please complete highlighted fields in the form above before submitting. ${missingFields.length} field${missingFields.length !== 1 ? 's' : ''} missing.`);
+      return;
+    }
+
+    if (blockingWarnings.length > 0) {
+      setLocalError(blockingWarnings.map((w) => w.message).join(' '));
       return;
     }
 
@@ -130,6 +200,28 @@ export default function SubmitSection() {
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           {localError ?? state.submitError}
+        </div>
+      )}
+
+      {/* ── Cross-check warnings ── */}
+      {blockingWarnings.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {blockingWarnings.map((w, i) => (
+            <div key={i} className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+              <span className="flex-shrink-0 text-base leading-none">🛑</span>
+              <span>{w.message}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {advisoryWarnings.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {advisoryWarnings.map((w, i) => (
+            <div key={i} className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+              <span className="flex-shrink-0 text-base leading-none">⚠️</span>
+              <span>{w.message}</span>
+            </div>
+          ))}
         </div>
       )}
 

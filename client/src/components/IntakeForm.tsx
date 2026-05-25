@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import type { FormData } from '../types';
 
@@ -136,6 +136,17 @@ export default function IntakeForm() {
 
   const [ieltsRemarks, setIeltsRemarks] = useState('');
   const [celpipRemarks, setCelpipRemarks] = useState('');
+
+  // ── Auto-fill address row 0 from address proof scan ────────────────────────
+  useEffect(() => {
+    const addr = formData.currentAddress?.trim();
+    if (!addr) return;
+    setAddrRows((prev) => {
+      const updated = [...prev];
+      updated[0] = { ...updated[0], address: addr };
+      return updated;
+    });
+  }, [formData.currentAddress]);
 
   // ── Required keys ───────────────────────────────────────────────────────────
 
@@ -801,7 +812,8 @@ export default function IntakeForm() {
         </h2>
 
         <SectionHeading>
-          List all addresses lived during last 10 years — most recent first, no gaps. All entries: Manual.
+          List all addresses lived during last 10 years — most recent first, no gaps.
+          Most recent address auto-filled from Address Proof scan; remaining entries: Manual.
         </SectionHeading>
 
         <table className="w-full border-collapse text-[11px]">
@@ -844,7 +856,7 @@ export default function IntakeForm() {
                   <input value={row.address}
                     onChange={(e) => { const r = [...addrRows]; r[i] = { ...r[i], address: e.target.value }; setAddrRows(r); }}
                     className="w-full bg-transparent text-[10px] border-b border-gray-300 outline-none" />
-                  <SrcBadge src="manual" />
+                  <SrcBadge src={i === 0 ? 'address' : 'manual'} />
                 </td>
                 <td className="border border-gray-400 px-1 py-0.5 bg-orange-50">
                   <input value={row.ownership}
