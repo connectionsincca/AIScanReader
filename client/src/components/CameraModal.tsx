@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { DocumentId, PageData, QualityFeedback } from '../types';
-import { analyzeVideoFrame, analyzeImageQuality, captureFrame, dataUrlToBase64 } from '../utils/imageAnalysis';
+import { analyzeVideoFrame, analyzeImageQuality, captureFrame, dataUrlToBase64, estimateSizeBytes, formatFileSize } from '../utils/imageAnalysis';
+import { MAX_PAGE_BYTES } from '../config/limits';
 import { warpAndScan } from '../utils/perspectiveTransform';
 import type { Corner } from '../utils/perspectiveTransform';
 import { validateScan } from '../utils/api';
@@ -292,10 +293,23 @@ export default function CameraModal({
   // ── Preview ───────────────────────────────────────────────────────────────────
 
   const acceptPage = useCallback((url: string) => {
+    // Enforce 1 MB per-page limit before accepting
+    const sizeBytes = estimateSizeBytes(url);
+    if (sizeBytes > MAX_PAGE_BYTES) {
+      feedbackLockRef.current = Date.now() + 5000;
+      setFeedback({
+        message: `Scan too large (${formatFileSize(sizeBytes)}). Max 1 MB per page — try again in better lighting.`,
+        type: 'error',
+      });
+      setModalStep('camera');
+      return;
+    }
+
     const page: PageData = {
       id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
       dataUrl: url,
       capturedAt: Date.now(),
+      sizeBytes,
     };
     setNewPages(prev => [...prev, page]);
     setPreviewUrl('');

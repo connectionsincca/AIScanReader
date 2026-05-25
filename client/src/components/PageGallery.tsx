@@ -1,4 +1,5 @@
 import type { PageData } from '../types';
+import { formatFileSize } from '../utils/imageAnalysis';
 
 interface Props {
   documentName: string;
@@ -37,8 +38,15 @@ export default function PageGallery({ documentName, pages, onRemovePage, onClose
                   className="w-full aspect-[3/4] object-cover"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                <div className="absolute top-2 left-2 bg-black/50 text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                  Page {i + 1}
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                  <span className="bg-black/50 text-white text-xs font-medium px-2 py-0.5 rounded-full">
+                    Page {i + 1}
+                  </span>
+                  {page.sizeBytes != null && page.sizeBytes > 0 && (
+                    <span className="bg-black/40 text-white/80 text-[10px] px-2 py-0.5 rounded-full">
+                      {formatFileSize(page.sizeBytes)}
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={() => onRemovePage(page.id)}

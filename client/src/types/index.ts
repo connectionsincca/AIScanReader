@@ -50,6 +50,7 @@ export interface PageData {
   id: string;
   dataUrl: string;   // data:image/jpeg;base64,...
   capturedAt: number; // timestamp ms
+  sizeBytes?: number; // estimated raw byte size of the image
 }
 
 export interface DocumentState {

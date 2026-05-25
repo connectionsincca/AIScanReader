@@ -140,3 +140,23 @@ export function captureFrame(video: HTMLVideoElement): string {
 export function dataUrlToBase64(dataUrl: string): string {
   return dataUrl.split(',')[1] ?? dataUrl;
 }
+
+/**
+ * Estimates the uncompressed byte size of a data-URL image by decoding the
+ * base64 portion length (3 bytes per 4 chars, minus padding).
+ */
+export function estimateSizeBytes(dataUrl: string): number {
+  const commaIdx = dataUrl.indexOf(',');
+  const base64 = commaIdx !== -1 ? dataUrl.slice(commaIdx + 1) : dataUrl;
+  const padding = (base64.match(/=+$/) ?? [''])[0].length;
+  return Math.floor(base64.length * 0.75) - padding;
+}
+
+/**
+ * Formats a byte count as a human-readable string (B / KB / MB).
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1_024) return `${bytes} B`;
+  if (bytes < 1_048_576) return `${(bytes / 1_024).toFixed(1)} KB`;
+  return `${(bytes / 1_048_576).toFixed(2)} MB`;
+}

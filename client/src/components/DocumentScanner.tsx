@@ -4,6 +4,8 @@ import { DOCUMENT_MAP } from '../config/documents';
 import DocumentRow from './DocumentRow';
 import TravelerPanel from './TravelerPanel';
 import type { DocumentId } from '../types';
+import { formatFileSize } from '../utils/imageAnalysis';
+import { MAX_TOTAL_BYTES } from '../config/limits';
 
 // ─── Section helpers ───────────────────────────────────────────────────────────
 
@@ -147,6 +149,14 @@ export default function DocumentScanner() {
   // Count all processed docs
   const processedCount = Object.values(state.documents).filter((d) => d.status === 'done').length;
 
+  // Total bytes across all document pages
+  const totalBytes = Object.values(state.documents)
+    .flatMap((d) => d.pages)
+    .reduce((sum, p) => sum + (p.sizeBytes ?? 0), 0);
+  const totalPct    = Math.min(100, (totalBytes / MAX_TOTAL_BYTES) * 100);
+  const totalNear   = totalPct >= 80 && totalPct < 100;
+  const totalFull   = totalPct >= 100;
+
   // Determine whether "Continue to Form" should be enabled
   const passportDone = state.documents['passport'].status === 'done';
   const spouseDone = !travelers.hasSpouse || state.documents['spousePassport'].status === 'done';
@@ -200,16 +210,54 @@ export default function DocumentScanner() {
           <p className="font-medium text-gray-700 mb-1">How it works</p>
           <ol className="list-decimal list-inside space-y-0.5">
             <li>Declare all travelers joining this application below</li>
-            <li>Click <strong>Scan</strong> to open your camera for each document</li>
-            <li>Place the document inside the frame and hold steady</li>
-            <li>Capture — add more pages if needed, then click Done</li>
-            <li>AI will automatically fill in your information</li>
+            <li>For each document, click <strong>Scan</strong> (camera) or <strong>Upload</strong> (file)</li>
+            <li>Scan: place document in frame, capture, then tap Done</li>
+            <li>Upload: select a clear JPG / PNG / WEBP image (max 1 MB per file)</li>
+            <li>AI will automatically fill in your information (total limit: 22 MB)</li>
           </ol>
         </div>
       )}
 
       {/* Traveler Panel */}
       <TravelerPanel />
+
+      {/* ── Total size tracker ─────────────────────────────────────────────────── */}
+      {totalBytes > 0 && (
+        <div className={`rounded-xl px-4 py-3 mb-4 ${
+          totalFull  ? 'bg-red-50 border border-red-200'   :
+          totalNear  ? 'bg-amber-50 border border-amber-200' :
+                       'bg-gray-50 border border-gray-100'
+        }`}>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className={`text-xs font-medium ${
+              totalFull ? 'text-red-700' : totalNear ? 'text-amber-700' : 'text-gray-600'
+            }`}>
+              {totalFull  ? '🚫 Document limit reached'    :
+               totalNear  ? '⚠ Approaching size limit'     :
+               '📦 Total document size'}
+            </span>
+            <span className={`text-xs tabular-nums ${
+              totalFull ? 'text-red-600 font-semibold' : totalNear ? 'text-amber-600 font-semibold' : 'text-gray-500'
+            }`}>
+              {formatFileSize(totalBytes)} / 22 MB
+            </span>
+          </div>
+          {/* Progress bar */}
+          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${
+                totalFull ? 'bg-red-500' : totalNear ? 'bg-amber-500' : 'bg-brand-500'
+              }`}
+              style={{ width: `${totalPct}%` }}
+            />
+          </div>
+          {totalFull && (
+            <p className="text-xs text-red-600 mt-1.5">
+              No more files can be added. Remove existing documents to free up space.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Document Upload Per Traveler */}
       <div className="mb-3">
