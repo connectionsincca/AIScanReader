@@ -55,6 +55,9 @@ The form covers:
 - Page 6: Brothers and sisters details
 - Page 7: Parents details + Canada entry dates
 
+> **Reference files for the form layout:**
+> `docs/tanan_immigration_form_v2.html` is the original HTML version of the Detailed Information Sheet that this web form is based on. Open it in a browser to see the exact field names, table layouts, and section order that the digital form replicates. If you ever need to understand why a specific field exists, or want to restructure a page, this file is the ground truth. `docs/Detailed Information_Tenon (4).pdf` is the physical paper version the agency uses — useful for confirming how the final printed output should look.
+
 ### Step 4 — Submit
 The system performs final checks:
 - **Blocking:** spouse or child names entered but no passport uploaded → submission prevented
