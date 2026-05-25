@@ -142,8 +142,8 @@ export default function TravelerPanel() {
         <div className="flex items-start gap-2 border border-dashed border-amber-300 rounded-lg px-3 py-2.5 text-xs text-amber-800 bg-white">
           <span className="text-base leading-none flex-shrink-0">📄</span>
           <span>
-            <strong>Birth certificates</strong> are required for all dependent children and recommended for the applicant.
-            Upload under the "Upload Only" section for each traveler.
+            <strong>Birth certificates</strong> are optional for all travelers.
+            You can upload them under the "Upload Only" section for each traveler if available.
           </span>
         </div>
       </div>
