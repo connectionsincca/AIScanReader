@@ -17,7 +17,7 @@ export interface SectionConfig {
   fields: FieldConfig[];
 }
 
-// ─── Form sections — mirrors Tanan Detailed Information Sheet (7 pages) ────────
+// ─── Form sections — mirrors Tanon Detailed Information Sheet (7 pages) ────────
 // Note: JSON-array fields (workHistory, educationHistory, spouseWorkHistory,
 // spouseEducationHistory) are populated by scanning and displayed read-only;
 // they are intentionally omitted here to avoid raw-JSON text fields in the UI.

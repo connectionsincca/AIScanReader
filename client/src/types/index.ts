@@ -70,7 +70,7 @@ export interface DocumentConfig {
 
 // ─── Form Data ─────────────────────────────────────────────────────────────────
 // All extractable fields (from scanned documents) + manual-entry fields needed
-// to populate the Tanan Detailed Information Sheet (7 pages).
+// to populate the Tanon Detailed Information Sheet (7 pages).
 //
 // Multi-value fields (workHistory, educationHistory, spouseWorkHistory,
 // spouseEducationHistory) are stored as JSON-array strings.
