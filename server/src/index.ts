@@ -5,6 +5,7 @@ import fs from 'fs';
 import http from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { rateLimit } from 'express-rate-limit';
+import helmet from 'helmet';
 import { config } from './config';
 import documentsRouter  from './routes/documents';
 import submissionRouter from './routes/submission';
@@ -16,6 +17,7 @@ const app = express();
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 
+app.use(helmet());
 app.use(cors({ origin: config.clientUrl, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
