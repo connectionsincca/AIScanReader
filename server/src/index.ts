@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import http from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { rateLimit } from 'express-rate-limit';
 import { config } from './config';
 import documentsRouter  from './routes/documents';
 import submissionRouter from './routes/submission';
@@ -19,6 +20,47 @@ app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+
+/**
+ * Tier 1 — Session creation: 10 attempts per 15 min per IP.
+ * Prevents someone farming session tokens by scripting Turnstile solvers.
+ */
+const sessionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many session requests. Please wait 15 minutes and try again.' },
+});
+
+/**
+ * Tier 2 — OCR endpoints: 60 requests per 15 min per IP.
+ * A real user scanning every document (passport, spouse, 4 kids, degree,
+ * work certs, IELTS…) makes at most ~40 calls. 60 gives comfortable headroom
+ * while capping a bad actor well below quota-exhaustion territory.
+ */
+const ocrLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many scan requests. Please wait 15 minutes and try again.' },
+});
+
+/**
+ * Tier 3 — Submission: 5 per hour per IP.
+ * One legitimate submission per session; allows a handful of retries if email
+ * fails, but stops bulk submissions from a single IP.
+ */
+const submitLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many submissions. Please wait an hour and try again.' },
+});
+
 // ── Health check ──────────────────────────────────────────────────────────────
 
 app.get('/api/health', (_req, res) => {
@@ -28,9 +70,13 @@ app.get('/api/health', (_req, res) => {
 // ── API routes ────────────────────────────────────────────────────────────────
 
 // Session endpoint — no auth required (this IS the auth step)
+app.use('/api/session', sessionLimiter);
 app.use('/api', sessionRouter);
 
 // All document-processing and submission routes require a valid session token
+app.use('/api/validate-scan', ocrLimiter);
+app.use('/api/extract-data',  ocrLimiter);
+app.use('/api/submit',        submitLimiter);
 app.use('/api', requireSession, documentsRouter);
 app.use('/api', requireSession, submissionRouter);
 
