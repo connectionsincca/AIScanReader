@@ -16,7 +16,10 @@
       "Bash(npx ts-node *)",
       "Bash(curl -s http://localhost:3001/)",
       "PowerShell(ngrok http 3001)",
-      "PowerShell(Start-Sleep -Seconds 4; try { \\(Invoke-RestMethod -Uri 'http://localhost:4040/api/tunnels' -ErrorAction Stop\\).tunnels | ForEach-Object { \"$\\($_.name\\): $\\($_.public_url\\)\" } } catch { \"ngrok local API not responding: $_\" })"
+      "PowerShell(Start-Sleep -Seconds 4; try { \\(Invoke-RestMethod -Uri 'http://localhost:4040/api/tunnels' -ErrorAction Stop\\).tunnels | ForEach-Object { \"$\\($_.name\\): $\\($_.public_url\\)\" } } catch { \"ngrok local API not responding: $_\" })",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Update CLAUDE.md with current architecture *)",
+      "Bash(git push *)"
     ]
   }
 }
