@@ -188,6 +188,23 @@ export interface FormData {
   dateRecentEntryCanada:    string;
 }
 
+// ─── DocumentId whitelist ──────────────────────────────────────────────────────
+// Kept in sync with the DocumentId union above. Used server-side to reject
+// unknown documentId values before they reach OpenAI or are used as object keys.
+
+export const VALID_DOCUMENT_IDS: ReadonlySet<DocumentId> = new Set([
+  'passport', 'marriageCertificate', 'addressProof', 'workExperienceCert',
+  'degreeCertificate', 'ieltsScoreSheet', 'celpipScoreSheet',
+  'bankStatement', 'salarySlips', 'taxReturn', 'netWorthStatement', 'propertyOwnership',
+  'birthCertificate', 'eventInvitationLetter', 'travelTickets', 'digitalPicture',
+  'spousePassport', 'spouseWorkExperienceCert', 'spouseDegreeCertificate',
+  'spouseEventInvitationLetter', 'spouseTravelTickets', 'spouseDigitalPicture',
+  'child1Passport', 'child1TravelTickets', 'child1DigitalPicture',
+  'child2Passport', 'child2TravelTickets', 'child2DigitalPicture',
+  'child3Passport', 'child3TravelTickets', 'child3DigitalPicture',
+  'child4Passport', 'child4TravelTickets', 'child4DigitalPicture',
+]);
+
 // ─── API request / response types ─────────────────────────────────────────────
 
 export interface ValidateScanRequest {

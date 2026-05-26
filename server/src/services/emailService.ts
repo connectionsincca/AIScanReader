@@ -10,8 +10,24 @@ const transporter = nodemailer.createTransport({
     user: config.smtp.user,
     pass: config.smtp.pass,
   },
-  tls: { rejectUnauthorized: process.env.NODE_ENV === 'production' },
+  // Always enforce TLS certificate validation — never skip in any environment.
+  // If you use a self-signed cert in dev, add it to NODE_EXTRA_CA_CERTS instead.
+  tls: { rejectUnauthorized: true },
 });
+
+/**
+ * Escape a string for safe insertion into an HTML context.
+ * Prevents a user-typed value like <script>alert(1)</script> from being
+ * rendered as live HTML in the agency's email client.
+ */
+function esc(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export async function sendSubmissionEmail(opts: {
   submissionId: string;
@@ -21,7 +37,9 @@ export async function sendSubmissionEmail(opts: {
   submittedAt: Date;
 }): Promise<void> {
   const { submissionId, formData, documentsPdf, formPdf, submittedAt } = opts;
-  const name = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || 'Unknown Applicant';
+  const name = esc(
+    [formData.firstName, formData.lastName].filter(Boolean).join(' ') || 'Unknown Applicant'
+  );
 
   const bodyHtml = `
 <!DOCTYPE html>
@@ -45,8 +63,8 @@ export async function sendSubmissionEmail(opts: {
   <p><span class="badge">New Submission</span></p>
 
   <div class="field"><div class="label">Applicant Name</div><div class="value">${name}</div></div>
-  <div class="field"><div class="label">Submission ID</div><div class="value">${submissionId}</div></div>
-  <div class="field"><div class="label">Submitted At</div><div class="value">${submittedAt.toISOString().replace('T', ' ').slice(0, 19)} UTC</div></div>
+  <div class="field"><div class="label">Submission ID</div><div class="value">${esc(submissionId)}</div></div>
+  <div class="field"><div class="label">Submitted At</div><div class="value">${esc(submittedAt.toISOString().replace('T', ' ').slice(0, 19))} UTC</div></div>
 
   <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0;">
 
@@ -67,7 +85,7 @@ export async function sendSubmissionEmail(opts: {
   await transporter.sendMail({
     from:    `"${config.smtp.fromName}" <${config.smtp.from}>`,
     to:      config.agencyEmail,
-    subject: `New Immigration Intake Submission — ${name} (${submissionId.slice(0, 8).toUpperCase()})`,
+    subject: `New Immigration Intake Submission — ${name} (${esc(submissionId).slice(0, 8).toUpperCase()})`,
     html:    bodyHtml,
     text:    `New Immigration Intake Submission\n\nApplicant: ${name}\nSubmission ID: ${submissionId}\nSubmitted: ${submittedAt.toISOString()}\n\nTwo PDFs are attached.`,
     attachments: [

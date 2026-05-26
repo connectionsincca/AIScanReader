@@ -1,0 +1,21 @@
+Fix remaining 4 production security gaps
+
+Item 7 - documentId whitelist validation
+  Added VALID_DOCUMENT_IDS (ReadonlySet) to server/src/types/index.ts.
+  Both /validate-scan and /extract-data now reject unknown documentId
+  values with 400 before the string reaches OpenAI or is used as a key.
+
+Item 8 - Submission deduplication
+  submission.ts keeps an in-memory Map<submissionId, expiry> (24h TTL,
+  hourly sweep). Duplicate submissionIds after a successful email send
+  return 200 silently - no second email to the agency, no error to user.
+
+Item 9 - SMTP TLS always enforced
+  Removed the NODE_ENV=production guard on rejectUnauthorized. TLS
+  certificate validation is now always true.
+
+Item 10 - FormData HTML sanitization in emails
+  Added esc() helper that escapes &, <, >, quotes before inserting any
+  value into the HTML email body. Applied to name, submissionId, timestamp.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>

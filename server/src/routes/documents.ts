@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { validateDocumentScan, extractDocumentData } from '../services/openaiService';
 import type { ValidateScanRequest, ExtractDataRequest } from '../types';
+import { VALID_DOCUMENT_IDS } from '../types';
 
 const router = Router();
 
@@ -11,6 +12,10 @@ router.post('/validate-scan', async (req: Request, res: Response) => {
 
   if (!documentId || !imageBase64) {
     return res.status(400).json({ error: 'documentId and imageBase64 are required' });
+  }
+
+  if (!VALID_DOCUMENT_IDS.has(documentId)) {
+    return res.status(400).json({ error: 'Invalid documentId.' });
   }
 
   try {
@@ -28,6 +33,10 @@ router.post('/extract-data', async (req: Request, res: Response) => {
 
   if (!documentId || !Array.isArray(pages) || pages.length === 0) {
     return res.status(400).json({ error: 'documentId and pages array are required' });
+  }
+
+  if (!VALID_DOCUMENT_IDS.has(documentId)) {
+    return res.status(400).json({ error: 'Invalid documentId.' });
   }
 
   if (pages.length > 10) {
