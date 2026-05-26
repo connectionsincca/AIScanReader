@@ -7,6 +7,8 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { config } from './config';
 import documentsRouter  from './routes/documents';
 import submissionRouter from './routes/submission';
+import sessionRouter    from './routes/session';
+import { requireSession } from './middleware/auth';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -25,8 +27,12 @@ app.get('/api/health', (_req, res) => {
 
 // ── API routes ────────────────────────────────────────────────────────────────
 
-app.use('/api', documentsRouter);
-app.use('/api', submissionRouter);
+// Session endpoint — no auth required (this IS the auth step)
+app.use('/api', sessionRouter);
+
+// All document-processing and submission routes require a valid session token
+app.use('/api', requireSession, documentsRouter);
+app.use('/api', requireSession, submissionRouter);
 
 // ── Frontend serving ──────────────────────────────────────────────────────────
 

@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { ConsentState } from '../types';
+import { verifyHuman } from '../utils/turnstile';
+import { createSession, setSessionToken } from '../utils/api';
 
 const CHECKBOXES: { key: keyof ConsentState; label: string }[] = [
   {
@@ -22,6 +25,25 @@ const CHECKBOXES: { key: keyof ConsentState; label: string }[] = [
 
 export default function ConsentSection() {
   const { state, setConsent, consentComplete, setStep } = useApp();
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+
+  async function handleContinue() {
+    setVerifying(true);
+    setVerifyError(null);
+    try {
+      const turnstileToken = await verifyHuman();
+      const sessionToken = await createSession(turnstileToken);
+      setSessionToken(sessionToken);
+      setStep('scanning');
+    } catch (err) {
+      setVerifyError(
+        err instanceof Error ? err.message : 'Verification failed. Please try again.'
+      );
+    } finally {
+      setVerifying(false);
+    }
+  }
 
   return (
     <section className="card p-5 sm:p-6 fade-in">
@@ -95,15 +117,33 @@ export default function ConsentSection() {
         )}
 
         {consentComplete && state.step === 'consent' && (
-          <button
-            onClick={() => setStep('scanning')}
-            className="btn-primary sm:ml-auto"
-          >
-            Continue to Document Scanning
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <div className="sm:ml-auto flex flex-col items-end gap-2">
+            <button
+              onClick={handleContinue}
+              disabled={verifying}
+              className="btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {verifying ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Verifying…
+                </>
+              ) : (
+                <>
+                  Continue to Document Scanning
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
+            </button>
+            {verifyError && (
+              <p className="text-sm text-red-600">{verifyError}</p>
+            )}
+          </div>
         )}
       </div>
     </section>
