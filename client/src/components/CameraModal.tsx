@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import type { DocumentId, PageData, QualityFeedback } from '../types';
 import { analyzeVideoFrame, analyzeImageQuality, captureFrame, dataUrlToBase64, estimateSizeBytes, formatFileSize } from '../utils/imageAnalysis';
 import { MAX_PAGE_BYTES } from '../config/limits';
@@ -354,14 +355,16 @@ export default function CameraModal({
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
-  return (
-    /* Backdrop — dark overlay over whatever the user is currently looking at */
+  // Render via portal so the modal is a direct child of <body>.
+  // This guarantees position:fixed is always relative to the viewport —
+  // even when a parent component uses transform/filter (e.g. fade-in animation)
+  // which would otherwise break fixed positioning.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70">
 
-    {/* Bottom-sheet card — slides up from the bottom of the current viewport.
-        93svh = 93% of the SMALL viewport height, which is the most conservative
-        measure: guaranteed to fit even when the browser toolbar is fully visible.
-        Rounded top corners make it clear this is a popup, not a new page.      */}
+    {/* Bottom-sheet: rises from the bottom of the VISIBLE viewport.
+        93svh uses the small viewport height — the most conservative measure,
+        guaranteed to fit even when the browser toolbar is fully showing.     */}
     <div className="w-full flex flex-col bg-black rounded-t-2xl overflow-hidden"
          style={{ height: '93svh' }}>
 
@@ -679,6 +682,7 @@ export default function CameraModal({
       )}
 
     </div>{/* end card */}
-    </div>/* end backdrop */
+    </div>,  /* end backdrop */
+    document.body
   );
 }
