@@ -329,8 +329,9 @@ const EW = [26, 24, 26, 24, 115, 42, 88, 88, 123];
 // From(yr37,mo50) + To(yr37,mo50) + employer82 + hrs/week71 + position71 + city74 + qualified84
 const WW = [37, 50, 37, 50, 82, 71, 71, 74, 84];
 
-// AW: addr=148, hrs=40, own=74, city=72, act=122 → 148+40+74+72+122=456 ✓
-const AW = [26, 24, 26, 24, 148, 40, 74, 72, 122];
+// AW: 9 cols — ratios matched to reference PDF screenshot (UW=556)
+// From(yr37,mo50) + To(yr37,mo50) + address104 + hrs/week67 + owned57 + city74 + activity80
+const AW = [37, 50, 37, 50, 104, 67, 57, 74, 80];
 
 // Header h1 needs to accommodate multi-line text in narrow cells
 const TH1 = 38;  // main header row height (accommodates 3-4 wrapped lines at 8pt)
