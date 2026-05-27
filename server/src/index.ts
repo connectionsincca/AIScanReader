@@ -102,7 +102,6 @@ if (fs.existsSync(clientDist)) {
     target: viteTarget,
     changeOrigin: true,
     ws: true,
-    logger: console,
   });
 
   app.use(viteProxy);
