@@ -116,12 +116,23 @@ export default function CameraModal({
 
   useEffect(() => { startCamera(); return () => stopCamera(); }, [startCamera, stopCamera]);
 
-  // Issue 1 fix: lock body scroll while modal is open so the page behind
-  // doesn't jump to the top when the modal mounts/unmounts.
+  // Scroll-lock: save scroll position, pin the body in place, restore on close.
+  // Simply setting overflow:hidden resets scrollY to 0 on mobile — this pattern
+  // keeps the page visually in place while the modal is open, then jumps back.
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    const scrollY = window.scrollY;
+    const body = document.body;
+    body.style.position   = 'fixed';
+    body.style.top        = `-${scrollY}px`;
+    body.style.width      = '100%';
+    body.style.overflowY  = 'scroll'; // keep scrollbar width so layout doesn't shift
+    return () => {
+      body.style.position  = '';
+      body.style.top       = '';
+      body.style.width     = '';
+      body.style.overflowY = '';
+      window.scrollTo(0, scrollY);   // restore exact position
+    };
   }, []);
 
   // FIX: video element stays in DOM always (just hidden) — re-attach stream if
