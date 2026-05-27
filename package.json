@@ -10,7 +10,7 @@
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
     "start": "node server/dist/index.js",
-    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+    "install:all": "npm install && cd client && npm install --include=dev && cd ../server && npm install --include=dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
