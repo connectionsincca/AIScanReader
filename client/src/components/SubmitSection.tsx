@@ -18,6 +18,40 @@ const BASE_REQUIRED: Array<keyof FormData> = [
   'deportedFlag', 'irccAppliedBefore', 'pnpAppliedBefore', 'hasRelativeInCanada',
 ];
 
+// ── PersonRow type (mirrors IntakeForm) ──────────────────────────────────────
+
+interface PersonRow {
+  familyName?: string; givenNames?: string; dob?: string;
+  placeOfBirth?: string; countryOfResidence?: string;
+  citizenship?: string; emailPhone?: string;
+  maritalStatus?: string; dateOfMarriage?: string;
+  passportInfo?: string; address?: string;
+  nativeLang?: string; occupation?: string;
+}
+
+// All parent fields except passportInfo are mandatory
+const PARENT_REQUIRED_KEYS: Array<keyof PersonRow> = [
+  'familyName', 'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
+  'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage',
+  'address', 'nativeLang', 'occupation',
+];
+
+const PARENT_FIELD_LABELS: Record<keyof PersonRow, string> = {
+  familyName: 'Family Name', givenNames: 'Given Names', dob: 'Date of Birth',
+  placeOfBirth: 'Place of Birth', countryOfResidence: 'Country of Residence',
+  citizenship: 'Citizenship', emailPhone: 'Email / Telephone',
+  maritalStatus: 'Marital Status', dateOfMarriage: 'Date of Marriage',
+  passportInfo: 'Passport Info', address: 'Address',
+  nativeLang: 'Native Language', occupation: 'Current Occupation',
+};
+
+// familyName is optional for siblings; all others required when givenNames is filled
+const SIBLING_REQUIRED_KEYS: Array<keyof PersonRow> = [
+  'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
+  'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage',
+  'address', 'nativeLang', 'occupation',
+];
+
 // ── JSON-safe parser ─────────────────────────────────────────────────────────
 
 function parseJsonSafe<T>(json: string | undefined, def: T): T {
@@ -25,7 +59,7 @@ function parseJsonSafe<T>(json: string | undefined, def: T): T {
   catch { return def; }
 }
 
-// ── Extra structural validations (tables + parents) ──────────────────────────
+// ── Extra structural validations (tables + parents + siblings) ───────────────
 
 function getExtraErrors(formData: Partial<FormData>, travelers: TravelerState): string[] {
   const errs: string[] = [];
@@ -49,27 +83,40 @@ function getExtraErrors(formData: Partial<FormData>, travelers: TravelerState): 
     errs.push('Please fill at least one row in the Address History table on Page 4 of the form.');
   }
 
-  // Applicant father family name
-  const father = parseJsonSafe<{ familyName?: string }>(formData.fatherInfo, {});
-  if (!father.familyName?.trim()) {
-    errs.push("Please enter your Father's Family Name in the Parents table on Page 7 of the form.");
-  }
+  // ── Parent validation — all fields except passportInfo are mandatory ──────
 
-  // Applicant mother family name
-  const mother = parseJsonSafe<{ familyName?: string }>(formData.motherInfo, {});
-  if (!mother.familyName?.trim()) {
-    errs.push("Please enter your Mother's Family Name in the Parents table on Page 7 of the form.");
-  }
-
-  // Spouse parents (if spouse declared)
-  if (travelers.hasSpouse) {
-    const spFather = parseJsonSafe<{ familyName?: string }>(formData.spouseFatherInfo, {});
-    if (!spFather.familyName?.trim()) {
-      errs.push("Please enter your Spouse's Father's Family Name in the Parents table on Page 7.");
+  const validateParent = (json: string | undefined, label: string) => {
+    const row = parseJsonSafe<PersonRow>(json, {});
+    const firstMissing = PARENT_REQUIRED_KEYS.find((k) => !row[k]?.trim());
+    if (firstMissing) {
+      errs.push(
+        `Please complete all mandatory fields for ${label} in the Parents table (Page 7). ` +
+        `Missing: ${PARENT_FIELD_LABELS[firstMissing]}.`
+      );
     }
-    const spMother = parseJsonSafe<{ familyName?: string }>(formData.spouseMotherInfo, {});
-    if (!spMother.familyName?.trim()) {
-      errs.push("Please enter your Spouse's Mother's Family Name in the Parents table on Page 7.");
+  };
+
+  validateParent(formData.fatherInfo,   "your Father");
+  validateParent(formData.motherInfo,   "your Mother");
+  if (travelers.hasSpouse) {
+    validateParent(formData.spouseFatherInfo, "your Spouse's Father");
+    validateParent(formData.spouseMotherInfo, "your Spouse's Mother");
+  }
+
+  // ── Sibling validation — all fields except familyName required if name filled ──
+
+  const siblings = parseJsonSafe<PersonRow[]>(formData.siblingInfo, []);
+  for (let i = 0; i < siblings.length; i++) {
+    const s = siblings[i];
+    if (!s.givenNames?.trim()) continue; // no name = skip
+    const firstMissing = SIBLING_REQUIRED_KEYS.find((k) => !s[k]?.trim());
+    if (firstMissing) {
+      errs.push(
+        `Please complete all details for Brother/Sister ${i + 1} on Page 6. ` +
+        `Family Name is optional, all other fields are required. ` +
+        `Missing: ${PARENT_FIELD_LABELS[firstMissing]}.`
+      );
+      break; // show one error at a time
     }
   }
 
@@ -90,8 +137,11 @@ export default function SubmitSection() {
     for (let i = 1; i <= travelers.childCount; i++) {
       ([`child${i}LastName`, `child${i}FirstName`, `child${i}DateOfBirth`, `child${i}PassportNumber`] as Array<keyof FormData>).forEach((k) => s.add(k));
     }
+    if (state.formData.maritalStatus?.toLowerCase().includes('married')) {
+      s.add('dateOfMarriage');
+    }
     return s;
-  }, [travelers]);
+  }, [travelers, state.formData.maritalStatus]);
 
   const missingFields = [...requiredKeys].filter((id) => !state.formData[id]?.trim());
 

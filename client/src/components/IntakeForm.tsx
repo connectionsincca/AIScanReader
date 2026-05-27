@@ -105,12 +105,9 @@ export default function IntakeForm() {
 
   // ── Local state for address, siblings, parents ──────────────────────────────
 
-  const [addrRows, setAddrRows] = useState<AddrRow[]>(
-    Array(5).fill(null).map(() => ({
-      fromYear: '', fromMonth: '', toYear: '', toMonth: '',
-      address: '', ownership: '', cityCountry: '', activity: '',
-    }))
-  );
+  const [addrRows, setAddrRows] = useState<AddrRow[]>([
+    { fromYear: '', fromMonth: '', toYear: '', toMonth: '', address: '', ownership: '', cityCountry: '', activity: '' },
+  ]);
 
   const [siblingRows, setSiblingRows] = useState<PersonRow[]>(
     Array(5).fill(null).map(() => emptyPerson())
@@ -156,8 +153,11 @@ export default function IntakeForm() {
     for (let i = 1; i <= travelers.childCount; i++) {
       ([`child${i}LastName`, `child${i}FirstName`, `child${i}DateOfBirth`, `child${i}PassportNumber`] as Array<keyof FormData>).forEach((k) => s.add(k));
     }
+    if (formData.maritalStatus?.toLowerCase().includes('married')) {
+      s.add('dateOfMarriage');
+    }
     return s;
-  }, [travelers]);
+  }, [travelers, formData.maritalStatus]);
 
   const autoFilledCount = Object.values(fieldMeta).filter((m) => m?.aiPopulated).length;
 
@@ -213,6 +213,33 @@ export default function IntakeForm() {
     );
   };
 
+  // ── Parent / sibling validation helpers ────────────────────────────────────
+
+  // All PersonRow fields except passportInfo are mandatory for parents
+  const PARENT_REQUIRED_KEYS: Array<keyof PersonRow> = [
+    'familyName', 'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
+    'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage',
+    'address', 'nativeLang', 'occupation',
+  ];
+
+  // familyName is optional for siblings; all others required when givenNames is filled
+  const SIBLING_REQUIRED_KEYS: Array<keyof PersonRow> = [
+    'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
+    'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage',
+    'address', 'nativeLang', 'occupation',
+  ];
+
+  const parentErr = (row: PersonRow, key: keyof PersonRow): boolean =>
+    submitAttempted && PARENT_REQUIRED_KEYS.includes(key) && !row[key]?.trim();
+
+  const siblingErr = (row: PersonRow, key: keyof PersonRow): boolean =>
+    submitAttempted && !!row.givenNames?.trim() && SIBLING_REQUIRED_KEYS.includes(key) && !row[key]?.trim();
+
+  const personInputCls = (isErr: boolean) =>
+    `w-full bg-transparent text-[11px] outline-none ${
+      isErr ? 'border-2 border-red-500 rounded px-0.5' : 'border-b border-gray-300'
+    }`;
+
   // ── Cell wrappers ───────────────────────────────────────────────────────────
 
   const lbl = (text: string, colSpan = 1) => (
@@ -255,46 +282,49 @@ export default function IntakeForm() {
     saveEdu(entries);
   };
 
-  const renderEduRows = (startIdx: number, endIdx: number) => {
+  const deleteEduRow = (idx: number) => {
     const entries = parseEdu();
-    const rows = [];
-    for (let i = startIdx; i < endIdx; i++) {
-      const e = entries[i] ?? { institution: '', fieldOfStudy: '', certificate: '', startDate: '', endDate: '', hrsPerWeek: '', cityCountry: '' };
-      rows.push(
-        <tr key={i}>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.startDate} onChange={(ev) => updateEduEntry(i, 'startDate', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" placeholder="YYYY/MM" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.endDate} onChange={(ev) => updateEduEntry(i, 'endDate', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" placeholder="YYYY/MM" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.institution} onChange={(ev) => updateEduEntry(i, 'institution', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.hrsPerWeek} onChange={(ev) => updateEduEntry(i, 'hrsPerWeek', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.fieldOfStudy} onChange={(ev) => updateEduEntry(i, 'fieldOfStudy', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.cityCountry} onChange={(ev) => updateEduEntry(i, 'cityCountry', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
-            <input value={e.certificate} onChange={(ev) => updateEduEntry(i, 'certificate', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-        </tr>
-      );
-    }
-    return rows;
+    entries.splice(idx, 1);
+    saveEdu(entries);
   };
+
+  const renderEduRows = () =>
+    parseEdu().map((e, i) => (
+      <tr key={i}>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.startDate} onChange={(ev) => updateEduEntry(i, 'startDate', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" placeholder="YYYY/MM" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.endDate} onChange={(ev) => updateEduEntry(i, 'endDate', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" placeholder="YYYY/MM" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.institution} onChange={(ev) => updateEduEntry(i, 'institution', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.hrsPerWeek} onChange={(ev) => updateEduEntry(i, 'hrsPerWeek', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.fieldOfStudy} onChange={(ev) => updateEduEntry(i, 'fieldOfStudy', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.cityCountry} onChange={(ev) => updateEduEntry(i, 'cityCountry', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50">
+          <input value={e.certificate} onChange={(ev) => updateEduEntry(i, 'certificate', ev.target.value)}
+            className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+        </td>
+        <td className="border border-gray-400 px-1 py-0.5 bg-pink-50 text-center">
+          <button onClick={() => deleteEduRow(i)} title="Remove row"
+            className="text-red-400 hover:text-red-600 font-bold text-sm leading-none">×</button>
+        </td>
+      </tr>
+    ));
 
   // ── Work history helpers ────────────────────────────────────────────────────
 
@@ -663,12 +693,18 @@ export default function IntakeForm() {
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Field of Study</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">City and Country</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Certificate/Diploma</th>
+              <th className="border border-gray-400 px-1 py-1 w-6"></th>
             </tr>
           </thead>
           <tbody>
-            {renderEduRows(0, Math.max(4, parseEdu().slice(0, 4).length))}
+            {renderEduRows()}
           </tbody>
         </table>
+        {parseEdu().length === 0 && (
+          <p className="text-[11px] text-gray-400 italic mt-1">
+            No entries yet — rows are added automatically when you scan education certificates, or click below to add manually.
+          </p>
+        )}
         <button
           onClick={addEduRow}
           className="mt-2 text-[11px] text-blue-600 underline hover:text-blue-800"
@@ -682,30 +718,8 @@ export default function IntakeForm() {
       {/* ══════════════════════════════════════════════════════════════════════ */}
       <Page num={2}>
         <h2 className="font-serif text-base font-bold uppercase tracking-wide border-b-2 border-gray-900 pb-1 mb-3">
-          Educational Institutes — Continued
+          English Language Test Results
         </h2>
-
-        <SectionHeading>Entries 5+ (most recent first)</SectionHeading>
-
-        <table className="w-full border-collapse text-[12px] mb-3">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">From</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">To</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Institution</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">Hrs/wk</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Field of Study</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">City/Country</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Certificate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {renderEduRows(4, Math.max(8, parseEdu().length))}
-          </tbody>
-        </table>
-        <button onClick={addEduRow} className="mt-1 mb-4 text-[11px] text-blue-600 underline hover:text-blue-800">
-          + Add education row
-        </button>
 
         <SectionHeading>English Language Test Results</SectionHeading>
 
@@ -825,6 +839,7 @@ export default function IntakeForm() {
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold whitespace-nowrap">Owned/Rented/Shared</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold">City and Country</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold">Activity</th>
+              <th className="border border-gray-400 px-1 py-1 w-6"></th>
             </tr>
           </thead>
           <tbody>
@@ -872,6 +887,15 @@ export default function IntakeForm() {
                     onChange={(e) => { const r = [...addrRows]; r[i] = { ...r[i], activity: e.target.value }; setAddrRows(r); }}
                     className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
                 </td>
+                <td className="border border-gray-400 px-1 py-0.5 bg-orange-50 text-center">
+                  {addrRows.length > 1 && (
+                    <button
+                      onClick={() => setAddrRows((r) => r.filter((_, idx) => idx !== i))}
+                      title="Remove row"
+                      className="text-red-400 hover:text-red-600 font-bold text-sm leading-none"
+                    >×</button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -880,7 +904,7 @@ export default function IntakeForm() {
           onClick={() => setAddrRows((r) => [...r, { fromYear: '', fromMonth: '', toYear: '', toMonth: '', address: '', ownership: '', cityCountry: '', activity: '' }])}
           className="mt-2 text-[11px] text-blue-600 underline hover:text-blue-800"
         >
-          + Add row
+          + Add address row
         </button>
       </Page>
 
@@ -977,6 +1001,7 @@ export default function IntakeForm() {
                   {[0, 1, 2, 3, 4].map((si) => {
                     const row = siblingRows[si];
                     const sibKey = ['familyName', 'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence', 'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage', 'address', 'nativeLang', 'occupation'][ai] as keyof PersonRow;
+                    const isErr = siblingErr(row, sibKey);
                     return (
                       <td key={si} className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
                         <input
@@ -986,7 +1011,7 @@ export default function IntakeForm() {
                             updated[si] = { ...updated[si], [sibKey]: e.target.value };
                             setSiblingRows(updated);
                           }}
-                          className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none"
+                          className={personInputCls(isErr)}
                         />
                       </td>
                     );
@@ -1051,13 +1076,13 @@ export default function IntakeForm() {
                   <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
                     <input value={fatherRow[parentRowKey] ?? ''}
                       onChange={(e) => setFatherRow((r) => ({ ...r, [parentRowKey]: e.target.value }))}
-                      className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+                      className={personInputCls(parentErr(fatherRow, parentRowKey))} />
                   </td>
                   {/* Mother */}
                   <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
                     <input value={motherRow[parentRowKey] ?? ''}
                       onChange={(e) => setMotherRow((r) => ({ ...r, [parentRowKey]: e.target.value }))}
-                      className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+                      className={personInputCls(parentErr(motherRow, parentRowKey))} />
                   </td>
                   {travelers.hasSpouse && (
                     <>
@@ -1067,12 +1092,12 @@ export default function IntakeForm() {
                       <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
                         <input value={spouseFatherRow[parentRowKey] ?? ''}
                           onChange={(e) => setSpouseFatherRow((r) => ({ ...r, [parentRowKey]: e.target.value }))}
-                          className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+                          className={personInputCls(parentErr(spouseFatherRow, parentRowKey))} />
                       </td>
                       <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
                         <input value={spouseMotherRow[parentRowKey] ?? ''}
                           onChange={(e) => setSpouseMotherRow((r) => ({ ...r, [parentRowKey]: e.target.value }))}
-                          className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
+                          className={personInputCls(parentErr(spouseMotherRow, parentRowKey))} />
                       </td>
                     </>
                   )}
