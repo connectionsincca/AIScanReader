@@ -1,20 +1,85 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { DOCUMENTS } from '../config/documents';
-import { dataUrlToBase64 } from '../utils/imageAnalysis';
-import { submitPackage } from '../utils/api';
-import type { FormData } from '../types';
+import type { FormData, TravelerState } from '../types';
+
+// ── Required field list (mirrors IntakeForm BASE_REQUIRED) ───────────────────
 
 const BASE_REQUIRED: Array<keyof FormData> = [
   'firstName', 'lastName',
   'passportNumber', 'passportIssuingCountry', 'passportIssueDate', 'passportExpiry',
   'dateOfBirth', 'cityOfBirth', 'countryOfBirth', 'citizenship',
   'currentAddress', 'countryOfResidence',
-  'phone', 'email', 'maritalStatus',
+  'phone', 'email',
+  'eyeColor', 'height',
+  'maritalStatus',
+  'nativeLanguage', 'currentOccupation', 'numberOfChildren',
+  'highestEducationCanadian', 'totalYearsEducation',
+  'deportedFlag', 'irccAppliedBefore', 'pnpAppliedBefore', 'hasRelativeInCanada',
 ];
 
+// ── JSON-safe parser ─────────────────────────────────────────────────────────
+
+function parseJsonSafe<T>(json: string | undefined, def: T): T {
+  try { return json ? JSON.parse(json) as T : def; }
+  catch { return def; }
+}
+
+// ── Extra structural validations (tables + parents) ──────────────────────────
+
+function getExtraErrors(formData: Partial<FormData>, travelers: TravelerState): string[] {
+  const errs: string[] = [];
+
+  // At least one education entry
+  const edu = parseJsonSafe<unknown[]>(formData.educationHistory, []);
+  if (edu.length === 0) {
+    errs.push('Please add at least one Education record on Page 1 of the form.');
+  }
+
+  // At least one work entry
+  const work = parseJsonSafe<unknown[]>(formData.workHistory, []);
+  if (work.length === 0) {
+    errs.push('Please add at least one Employment record on Page 3 of the form.');
+  }
+
+  // At least one address row with content
+  const addr = parseJsonSafe<Array<{ address?: string }>>(formData.addressHistory, []);
+  const hasAddr = addr.some((r) => r.address?.trim());
+  if (!hasAddr) {
+    errs.push('Please fill at least one row in the Address History table on Page 4 of the form.');
+  }
+
+  // Applicant father family name
+  const father = parseJsonSafe<{ familyName?: string }>(formData.fatherInfo, {});
+  if (!father.familyName?.trim()) {
+    errs.push("Please enter your Father's Family Name in the Parents table on Page 7 of the form.");
+  }
+
+  // Applicant mother family name
+  const mother = parseJsonSafe<{ familyName?: string }>(formData.motherInfo, {});
+  if (!mother.familyName?.trim()) {
+    errs.push("Please enter your Mother's Family Name in the Parents table on Page 7 of the form.");
+  }
+
+  // Spouse parents (if spouse declared)
+  if (travelers.hasSpouse) {
+    const spFather = parseJsonSafe<{ familyName?: string }>(formData.spouseFatherInfo, {});
+    if (!spFather.familyName?.trim()) {
+      errs.push("Please enter your Spouse's Father's Family Name in the Parents table on Page 7.");
+    }
+    const spMother = parseJsonSafe<{ familyName?: string }>(formData.spouseMotherInfo, {});
+    if (!spMother.familyName?.trim()) {
+      errs.push("Please enter your Spouse's Mother's Family Name in the Parents table on Page 7.");
+    }
+  }
+
+  return errs;
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
+
 export default function SubmitSection() {
-  const { state, setSubmitting, setStep, setSubmitError, travelers, setSubmitAttempted } = useApp();
+  const { state, setStep, setSubmitAttempted, travelers } = useApp();
   const [localError, setLocalError] = useState<string | null>(null);
 
   const requiredKeys = useMemo<Set<keyof FormData>>(() => {
@@ -30,19 +95,13 @@ export default function SubmitSection() {
 
   const missingFields = [...requiredKeys].filter((id) => !state.formData[id]?.trim());
 
-  // ── Cross-check: proof documents vs. manually entered data ─────────────────
+  // ── Cross-check: proof documents vs. manually entered data ──────────────────
 
   const highSchoolOnly = ['high school', 'secondary', '10th', '12th', 'hsc', 'ssc', 'matric', 'nil', 'none'];
 
-  const workEntries = (() => {
-    try { return JSON.parse(state.formData.workHistory ?? '[]') as unknown[]; }
-    catch { return []; }
-  })();
+  const workEntries = parseJsonSafe<unknown[]>(state.formData.workHistory, []);
 
-  const eduEntries = (() => {
-    try { return JSON.parse(state.formData.educationHistory ?? '[]') as Array<{ certificate?: string }>; }
-    catch { return []; }
-  })();
+  const eduEntries = parseJsonSafe<Array<{ certificate?: string }>>(state.formData.educationHistory, []);
 
   const hasHigherEdu = eduEntries.some((e) => {
     const cert = (e.certificate ?? '').toLowerCase();
@@ -95,13 +154,21 @@ export default function SubmitSection() {
   const blockingWarnings  = crossWarnings.filter((w) => w.blocking);
   const advisoryWarnings  = crossWarnings.filter((w) => !w.blocking);
 
-  const handleSubmit = async () => {
+  // ── Validate and advance to review step ─────────────────────────────────────
+
+  const handleContinue = () => {
     setLocalError(null);
 
     if (missingFields.length > 0) {
       setSubmitAttempted(true);
-      // Don't bake the count into the string — it's shown live in the summary card above
-      setLocalError('Please complete the highlighted fields in the form above before submitting.');
+      setLocalError('Please complete the highlighted fields in the form above before continuing.');
+      return;
+    }
+
+    // Table + parent validations
+    const extraErrs = getExtraErrors(state.formData, travelers);
+    if (extraErrs.length > 0) {
+      setLocalError(extraErrs[0]);
       return;
     }
 
@@ -110,47 +177,14 @@ export default function SubmitSection() {
       return;
     }
 
-    const docsWithPages = DOCUMENTS
-      .filter((d) => state.documents[d.id].pages.length > 0)
-      .map((d) => ({
-        id: d.id,
-        name: d.name,
-        pages: state.documents[d.id].pages.map((p) => dataUrlToBase64(p.dataUrl)),
-      }));
-
-    if (docsWithPages.length === 0) {
-      setLocalError('Please scan at least one document before submitting.');
+    const scannedDocs = DOCUMENTS.filter((d) => state.documents[d.id].pages.length > 0);
+    if (scannedDocs.length === 0) {
+      setLocalError('Please scan at least one document before continuing.');
       return;
     }
 
-    setSubmitting(true);
-    setSubmitError(null);
-
-    try {
-      const result = await submitPackage({
-        submissionId: state.submissionId,
-        formData: state.formData,
-        documents: docsWithPages,
-      });
-
-      if (result.success) {
-        setStep('complete');
-      } else {
-        setLocalError(result.message || 'Submission failed. Please try again.');
-      }
-    } catch (err) {
-      const status = (err as { response?: { status: number } }).response?.status;
-      const msg    = (err as Error).message ?? '';
-      if (status === 401) {
-        setLocalError('Your session has expired. Please refresh the page and start again from Step 1.');
-      } else if (msg.includes('Network') || msg.includes('timeout')) {
-        setLocalError('Connection error. Please check your internet connection and try again.');
-      } else {
-        setLocalError('Submission failed. Please try again in a few moments.');
-      }
-    } finally {
-      setSubmitting(false);
-    }
+    // All good — advance to review
+    setStep('complete');
   };
 
   const scannedCount = DOCUMENTS.filter((d) => state.documents[d.id].pages.length > 0).length;
@@ -161,13 +195,13 @@ export default function SubmitSection() {
         <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center">
           <svg className="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Submit Your Package</h2>
+          <h2 className="text-base font-semibold text-gray-900">Ready to Submit?</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Your documents will be converted to PDF and securely emailed to the immigration agency.
+            Complete all required fields, then review your package before sending.
           </p>
         </div>
       </div>
@@ -191,7 +225,7 @@ export default function SubmitSection() {
         <div>
           <p className="text-xs text-gray-500">Status</p>
           {missingFields.length === 0 ? (
-            <p className="text-sm font-medium text-green-600">Ready to submit</p>
+            <p className="text-sm font-medium text-green-600">Ready to review</p>
           ) : (
             <p className="text-sm font-medium text-red-600">
               {missingFields.length} field{missingFields.length !== 1 ? 's' : ''} missing
@@ -201,17 +235,17 @@ export default function SubmitSection() {
       </div>
 
       {/* Errors */}
-      {(localError || state.submitError) && (
+      {localError && (
         <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-sm text-red-700">
           <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {localError ?? state.submitError}
+          {localError}
         </div>
       )}
 
-      {/* ── Cross-check warnings ── */}
+      {/* Cross-check warnings */}
       {blockingWarnings.length > 0 && (
         <div className="space-y-2 mb-4">
           {blockingWarnings.map((w, i) => (
@@ -233,45 +267,15 @@ export default function SubmitSection() {
         </div>
       )}
 
-      {/* What happens next */}
-      <div className="text-sm text-gray-600 mb-5 space-y-1.5">
-        <p className="font-medium text-gray-700">What happens when you submit:</p>
-        <ul className="list-disc list-inside space-y-1 text-gray-500">
-          <li>Your scanned pages will be combined into a single PDF</li>
-          <li>Your completed form will be converted to a PDF</li>
-          <li>Both PDFs will be securely emailed to the immigration agency</li>
-          <li>All temporary files will be deleted immediately after sending</li>
-        </ul>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button
-          onClick={handleSubmit}
-          disabled={state.submitting}
-          className="btn-primary text-base py-3.5 flex-1 sm:flex-none sm:px-8"
-        >
-          {state.submitting ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Submitting…
-            </>
-          ) : (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-              Submit to Immigration Agency
-            </>
-          )}
-        </button>
-
-        {state.submitting && (
-          <p className="text-sm text-gray-500 self-center">
-            This may take 20–30 seconds while we generate your PDFs…
-          </p>
-        )}
-      </div>
+      <button
+        onClick={handleContinue}
+        className="btn-primary text-base py-3.5 w-full sm:w-auto sm:px-10"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        Review &amp; Confirm Submission
+      </button>
     </section>
   );
 }

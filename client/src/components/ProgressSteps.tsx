@@ -2,10 +2,10 @@ import { useApp } from '../context/AppContext';
 import type { AppStep } from '../types';
 
 const STEPS: { id: AppStep; label: string; short: string }[] = [
-  { id: 'consent',  label: 'Consent',          short: '1' },
-  { id: 'scanning', label: 'Scan Documents',    short: '2' },
-  { id: 'form',     label: 'Complete Form',     short: '3' },
-  { id: 'complete', label: 'Submit',            short: '4' },
+  { id: 'consent',  label: 'Consent',           short: '1' },
+  { id: 'scanning', label: 'Scan Documents',     short: '2' },
+  { id: 'form',     label: 'Complete Form',      short: '3' },
+  { id: 'complete', label: 'Review & Confirm',   short: '4' },
 ];
 
 const STEP_ORDER: AppStep[] = ['consent', 'scanning', 'form', 'complete'];
@@ -14,8 +14,8 @@ export default function ProgressSteps() {
   const { state, setStep } = useApp();
   const currentIndex = STEP_ORDER.indexOf(state.step);
 
-  // Back is available on scanning (1) and form (2) only — not on consent or complete
-  const canGoBack = currentIndex > 0 && currentIndex < STEP_ORDER.length - 1;
+  // Back is available on steps 1-3 (scanning, form, complete) — not on consent or submitted
+  const canGoBack = currentIndex > 0;
   const prevStep  = canGoBack ? STEP_ORDER[currentIndex - 1] : null;
 
   return (
@@ -63,7 +63,7 @@ export default function ProgressSteps() {
         })}
       </div>
 
-      {/* Previous button — shown on scanning and form steps */}
+      {/* Previous button — shown on scanning, form, and review/confirm steps */}
       {canGoBack && prevStep && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <button

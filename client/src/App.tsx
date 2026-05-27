@@ -5,6 +5,7 @@ import ConsentSection from './components/ConsentSection';
 import DocumentScanner from './components/DocumentScanner';
 import IntakeForm from './components/IntakeForm';
 import SubmitSection from './components/SubmitSection';
+import ReviewSection from './components/ReviewSection';
 import SuccessScreen from './components/SuccessScreen';
 
 function Portal() {
@@ -15,7 +16,8 @@ function Portal() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [state.step]);
 
-  if (state.step === 'complete') return <SuccessScreen />;
+  // Success screen sits outside the main layout shell
+  if (state.step === 'submitted') return <SuccessScreen />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,8 +51,8 @@ function Portal() {
         {state.step === 'consent'  && <ConsentSection />}
         {state.step === 'scanning' && <DocumentScanner />}
         {state.step === 'form'     && <><IntakeForm /><SubmitSection /></>}
+        {state.step === 'complete' && <ReviewSection />}
       </main>
-
     </div>
   );
 }

@@ -186,6 +186,18 @@ export interface FormData {
   // ── Page 7 — Canada entry dates ─────────────────────────────────────────
   dateEntryCanada:          string;
   dateRecentEntryCanada:    string;
+
+  // ── Local state serialised for PDF generation ────────────────────────────
+  // Synced via useEffect in IntakeForm so the server can build all 7 pages.
+  addressHistory:     string;  // JSON AddrRow[]
+  fatherInfo:         string;  // JSON PersonRow (applicant's father)
+  motherInfo:         string;  // JSON PersonRow (applicant's mother)
+  spouseFatherInfo:   string;  // JSON PersonRow (spouse's father)
+  spouseMotherInfo:   string;  // JSON PersonRow (spouse's mother)
+  siblingInfo:        string;  // JSON PersonRow[] (up to 5 siblings)
+  ieltsRemarks:       string;
+  celpipRemarks:      string;
+  travelersInfo:      string;  // JSON {hasSpouse: boolean, childCount: number}
 }
 
 // ─── DocumentId whitelist ──────────────────────────────────────────────────────

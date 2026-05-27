@@ -55,11 +55,22 @@ const emptyPerson = (): PersonRow => ({
 // ─── Required fields ───────────────────────────────────────────────────────────
 
 const BASE_REQUIRED: Array<keyof FormData> = [
+  // Identity & passport
   'firstName', 'lastName',
   'passportNumber', 'passportIssuingCountry', 'passportIssueDate', 'passportExpiry',
   'dateOfBirth', 'cityOfBirth', 'countryOfBirth', 'citizenship',
+  // Contact & address
   'currentAddress', 'countryOfResidence',
-  'phone', 'email', 'maritalStatus',
+  'phone', 'email',
+  // Physical
+  'eyeColor', 'height',
+  // Status
+  'maritalStatus',
+  'nativeLanguage', 'currentOccupation', 'numberOfChildren',
+  // Education summary
+  'highestEducationCanadian', 'totalYearsEducation',
+  // Yes/No flags — all mandatory (user must answer)
+  'deportedFlag', 'irccAppliedBefore', 'pnpAppliedBefore', 'hasRelativeInCanada',
 ];
 
 // ─── Page wrapper component ────────────────────────────────────────────────────
@@ -122,7 +133,18 @@ export default function IntakeForm() {
       updated[0] = { ...updated[0], address: addr };
       return updated;
     });
-  }, [formData.currentAddress]);
+  }, [formData.currentAddress]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Sync local state → formData so server PDF builder receives all data ─────
+  useEffect(() => { setFormField('addressHistory',   JSON.stringify(addrRows));       }, [addrRows]);       // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('fatherInfo',        JSON.stringify(fatherRow));      }, [fatherRow]);      // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('motherInfo',        JSON.stringify(motherRow));      }, [motherRow]);      // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('spouseFatherInfo',  JSON.stringify(spouseFatherRow));}, [spouseFatherRow]);// eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('spouseMotherInfo',  JSON.stringify(spouseMotherRow));}, [spouseMotherRow]);// eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('siblingInfo',       JSON.stringify(siblingRows));    }, [siblingRows]);    // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('ieltsRemarks',   ieltsRemarks);  }, [ieltsRemarks]);  // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('celpipRemarks',  celpipRemarks); }, [celpipRemarks]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormField('travelersInfo', JSON.stringify(travelers)); }, [travelers]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Required keys ───────────────────────────────────────────────────────────
 
@@ -168,8 +190,12 @@ export default function IntakeForm() {
 
   const yn = (key: keyof FormData) => {
     const v = formData[key] ?? '';
+    const isReq  = requiredKeys.has(key);
+    const isEmpty = submitAttempted && isReq && !v;
     return (
-      <div className="flex items-center justify-center gap-4 text-xs py-0.5">
+      <div className={`flex items-center justify-center gap-4 text-xs py-0.5 ${
+        isEmpty ? 'border-2 border-red-500 rounded px-1' : ''
+      }`}>
         {(['no', 'yes'] as const).map((opt) => (
           <label key={opt} className="flex flex-col items-center gap-0.5 cursor-pointer text-[11px] font-semibold">
             <input
