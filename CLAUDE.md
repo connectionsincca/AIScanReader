@@ -32,7 +32,7 @@ In development, always access the app via **http://localhost:3001** — not the 
 
 All production security concerns are already implemented:
 
-- **`helmet()`** — HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and other security headers set in `server/src/index.ts`
+- **`helmet()`** — configured with a custom CSP in `server/src/index.ts`. The default `helmet()` CSP uses `script-src 'self'` which blocks the Cloudflare Turnstile script — causing `window.turnstile` to be `undefined` and all session requests to fail with 403. The custom CSP explicitly allows `https://challenges.cloudflare.com` in `scriptSrc`, `frameSrc`, and `connectSrc`
 - **CORS** — locked to `config.clientUrl` (from `CLIENT_URL` env var, not `origin: '*'`)
 - **Session auth** — Cloudflare Turnstile bot-protection on the consent step. `POST /api/session` verifies the Turnstile token and issues a 64-char hex session token (4-hour TTL). All `/api/documents/*` and `/api/submit` routes require `requireSession` middleware (`server/src/middleware/auth.ts`). Sessions live in an in-memory Map in `server/src/services/sessionStore.ts`
 - **Rate limiting** — three-tier via `express-rate-limit`: session creation (10/15 min), OCR endpoints (60/15 min), submit (5/hour)
@@ -175,3 +175,10 @@ Used for father, mother, spouse-father, spouse-mother, and siblings. The `accomp
 ## Environment
 
 `server/.env` is required to start the server (all variables validated at boot via `require_env()`). Required variables: `OPENAI_API_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `AGENCY_EMAIL`, `TURNSTILE_SECRET_KEY`. Optional: `PORT` (default 3001), `CLIENT_URL` (default http://localhost:5173). A template is at `server/.env.example`. The OpenAI key must have gpt-4o access. Camera scanning requires HTTPS in production — use ngrok for local mobile testing (`ngrok http 3001`).
+
+## Railway Deployment Notes
+
+- **`http-proxy-middleware` is pinned to v2.x** — v4 dropped CommonJS support. The server compiles to CommonJS (`"module": "commonjs"` in `server/tsconfig.json`). `require()` of an ESM-only package fails at startup even though the proxy is never used in production. Do not upgrade past v2.
+- **`npm install --include=dev`** — Railway's Nixpacks sets `NODE_ENV=production` during the install phase, which skips `devDependencies`. TypeScript and Vite are `devDependencies` — without them the build fails with `tsc: not found`. The `install:all` script in `package.json` uses `--include=dev` for client and server installs.
+- **`VITE_TURNSTILE_SITE_KEY`** — this is a Vite build-time variable. It must be set in Railway Variables **before** the build runs; it gets baked into the JS bundle. Adding it after a deploy requires a manual redeploy to take effect.
+- **Port** — enter `3001` when Railway prompts for the port (domain generation and custom domain setup).

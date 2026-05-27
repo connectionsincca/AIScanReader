@@ -35,13 +35,13 @@ Runs as a single Node.js process. Serves both the API and the built React static
 | **Express** | 4.18 | Web framework / HTTP server | MIT — Free |
 | **pdf-lib** | 1.17 | Generate intake form PDFs in memory | MIT — Free |
 | **Nodemailer** | 6.9 | Send emails with PDF attachments | MIT — Free |
-| **Helmet** | 8.2 | Security HTTP headers (HSTS, XFO, CSP…) | MIT — Free |
+| **Helmet** | 8.2 | Security HTTP headers with custom CSP allowing Cloudflare Turnstile | MIT — Free |
 | **cors** | 2.8 | CORS policy enforcement | MIT — Free |
 | **express-rate-limit** | 8.5 | Three-tier rate limiting (session / OCR / submit) | MIT — Free |
 | **dotenv** | 16.3 | Load `.env` file in local development | BSD-2 — Free |
 | **openai** | 4.28 | Official OpenAI SDK (GPT-4o calls) | MIT — Free |
 | **uuid** | 9.0 | Generate submission IDs for deduplication | MIT — Free |
-| **http-proxy-middleware** | 4.0 | Dev-mode proxy: Express → Vite HMR | MIT — Free |
+| **http-proxy-middleware** | **2.x** | Dev-mode proxy: Express → Vite HMR. Pinned to v2 — v4 is ESM-only and incompatible with CommonJS compilation target | MIT — Free |
 | **selfsigned** | 5.5 | (Dev only) Generate self-signed HTTPS cert for mobile camera testing | MIT — Free |
 
 ---
@@ -57,6 +57,7 @@ Used only during development; not deployed.
 | **concurrently** | 8.2 | Run Vite + Express in one terminal | Free |
 | **cross-env** | 7.0 | Set env vars in npm scripts cross-platform | Free |
 | **Git** | — | Source control | Free |
+| **ngrok** | — | HTTPS tunnel for local mobile/UAT testing | Free (1 static domain on free plan) |
 
 ---
 
@@ -80,13 +81,13 @@ These are third-party services the running application calls at runtime.
 
 ---
 
-### 4b. Cloudflare — Bot Protection & DNS
+### 4b. Cloudflare — Bot Protection
 
 | Service | Purpose | Cost |
 |---|---|---|
-| **Cloudflare DNS** | Authoritative DNS for the domain, DDoS protection, CDN | **Free** |
 | **Cloudflare Turnstile** | Invisible bot/human verification on the consent step (replaces CAPTCHA) | **Free** (unlimited challenges) |
-| **Cloudflare SSL** | Automatic HTTPS certificate via Cloudflare proxy | **Free** |
+
+> **DNS status:** DNS is currently managed by **Wix** (nameservers: `ns12.wixdns.net`, `ns13.wixdns.net`). Wix does not allow editing NS records from the DNS panel. Moving DNS to Cloudflare is a planned future step — will be done when transferring domain ownership away from Wix.
 
 | Key env vars | |
 |---|---|
@@ -97,24 +98,28 @@ These are third-party services the running application calls at runtime.
 
 ### 4c. SMTP Provider — Outbound Email
 
-The app emails completed intake packages (two PDF attachments) to the agency inbox.
+Currently using **Gmail App Password** (free, zero setup).
 
-| Option | Free tier | Paid | Notes |
-|---|---|---|---|
-| **Resend** *(recommended)* | 3,000 emails/month, 100/day | $20/month (50k emails) | Best deliverability, easiest setup, dev-friendly |
-| **Gmail App Password** | 500/day | Free | Zero setup; sender shows as your Gmail address |
-| **Brevo (Sendinblue)** | 300/day | $25/month (20k emails) | Good deliverability on custom domain |
+| Detail | Value |
+|---|---|
+| **Provider** | Gmail (smtp.gmail.com) |
+| **Cost** | Free |
+| **Daily limit** | 500 emails/day |
+| **Attachment limit** | 25 MB per email |
+| **Setup** | Gmail account → myaccount.google.com/apppasswords → generate App Password |
+
+> **Sender address** shows as the Gmail account (e.g. `info@connectionsink.ca` or personal Gmail). For a branded `noreply@connectionsink.ca` sender, switch to Resend or Brevo in future.
 
 | Key env vars | |
 |---|---|
-| `SMTP_HOST` | e.g., `smtp.resend.com` |
+| `SMTP_HOST` | `smtp.gmail.com` |
 | `SMTP_PORT` | `587` |
-| `SMTP_SECURE` | `false` (STARTTLS on 587) |
-| `SMTP_USER` | e.g., `resend` |
-| `SMTP_PASS` | SMTP password or API key |
-| `SMTP_FROM` | Sender address shown in email |
-| `SMTP_FROM_NAME` | Display name shown in email |
-| `AGENCY_EMAIL` | Recipient — agency inbox for intake packages |
+| `SMTP_SECURE` | `false` |
+| `SMTP_USER` | Gmail address |
+| `SMTP_PASS` | 16-char App Password |
+| `SMTP_FROM` | Gmail address (sender) |
+| `SMTP_FROM_NAME` | Display name on emails |
+| `AGENCY_EMAIL` | Tanon Immigration's inbox (recipient of all intake packages) |
 
 ---
 
@@ -125,22 +130,42 @@ The app emails completed intake packages (two PDF attachments) to the agency inb
 | Detail | Value |
 |---|---|
 | **Plan** | Hobby ($5/month credit included) |
+| **Project name** | observant-bravery (Railway auto-generated) |
+| **Production URL** | `https://scai.connectionsinc.ca` |
+| **Railway internal URL** | auto-generated `.up.railway.app` domain |
 | **What it runs** | Single Node.js process (Express serves API + static files) |
 | **Build command** | `npm run build` |
 | **Start command** | `node server/dist/index.js` |
-| **HTTPS** | Automatic (via Railway's proxy) |
-| **Custom domain** | Supported — point CNAME in Cloudflare |
+| **Port** | 3001 |
+| **HTTPS** | Automatic (Railway edge + Let's Encrypt for custom domain) |
+| **Custom domain** | `scai.connectionsinc.ca` — CNAME set in Wix DNS |
 | **Auto-deploy** | On every push to `main` branch |
 | **Dashboard** | railway.app |
 | **Estimated monthly cost** | $5 – $10 (low-traffic app stays within the $5 credit) |
 
-### 5b. Domain Registrar
+> **Railway build gotcha:** Nixpacks sets `NODE_ENV=production` during the install phase, which causes `npm install` to skip `devDependencies`. TypeScript and Vite are in `devDependencies` and are needed for the build. Fix: use `npm install --include=dev` in the `install:all` script (already applied in `package.json`).
+
+### 5b. Domain
 
 | Detail | Value |
 |---|---|
-| **Registrar options** | Cloudflare Registrar (at-cost pricing), Namecheap, GoDaddy |
-| **Estimated cost** | $10 – $15/year (~₹850 – ₹1,250) for a `.com` |
-| **Renewal** | Annual |
+| **Domain** | `connectionsinc.ca` |
+| **Registrar** | Wix (domain purchased through Wix) |
+| **DNS management** | Wix DNS (ns12.wixdns.net / ns13.wixdns.net) |
+| **Subdomain in use** | `scai.connectionsinc.ca` → Railway |
+| **Future plan** | Transfer domain ownership to Cloudflare Registrar (supports `.ca`) when moving away from Wix |
+| **Estimated cost** | ~$15 CAD/year |
+
+### 5c. UAT / Testing Environment
+
+| Detail | Value |
+|---|---|
+| **Tool** | ngrok (free static domain) |
+| **UAT URL** | `https://bonelike-remover-discount.ngrok-free.dev` |
+| **How it works** | Tunnels `localhost:3001` to a public HTTPS URL |
+| **OpenAI key** | Personal key (separate from production) |
+| **Limitation** | Only works while local server + ngrok are running |
+| **Best for** | Personal testing, mobile camera testing |
 
 ---
 
@@ -149,9 +174,9 @@ The app emails completed intake packages (two PDF attachments) to the agency inb
 | Item | Cost (USD/month) | Notes |
 |---|---|---|
 | Railway hosting | $5 – $10 | Scales with usage |
-| Domain name | ~$1 | Billed annually (~$12/year) |
-| Cloudflare | $0 | Free plan covers all needs |
-| SMTP (Resend) | $0 | Free up to 3,000 emails/month |
+| Domain name (`connectionsinc.ca`) | ~$1 | Billed annually (~$15 CAD/year via Wix) |
+| Cloudflare Turnstile | $0 | Free plan, unlimited challenges |
+| SMTP (Gmail) | $0 | Free, 500 emails/day |
 | OpenAI API | Variable | See per-intake estimate below |
 | **Fixed monthly total** | **~$6 – $11** | Excluding OpenAI |
 
@@ -180,6 +205,9 @@ Record major decisions here so future maintainers understand the *why*.
 | 2026-05 | **Cloudflare Turnstile** (not reCAPTCHA or hCaptcha) | Privacy-friendly (no tracking cookies), invisible mode works without user interaction, free unlimited challenges |
 | 2026-05 | **In-memory session store** (not Redis/DB) | The app is single-instance, sessions are short-lived (4h), and keeping state in-process is zero-dependency. If the app scales to multiple instances, swap `sessionStore.ts` for Redis |
 | 2026-05 | **Railway** over Vercel/Netlify | The app is a persistent Express server, not serverless. Railway runs it as a long-lived process without cold starts |
+| 2026-05 | **Downgraded http-proxy-middleware to v2** | v4 is ESM-only; server compiles to CommonJS. `require()` of an ESM package fails at startup even though the proxy is never used in production. v2 is CJS-compatible |
+| 2026-05 | **Custom helmet CSP** (not default) | Default `helmet()` blocks all external scripts via `script-src 'self'`. This silently blocked the Cloudflare Turnstile script, causing `window.turnstile` to be `undefined` and all session requests to fail with 403 |
+| 2026-05 | **Gmail SMTP** (not Resend) | Internal agency tool sending one email per submission. Gmail free tier (500/day) is more than sufficient. 25 MB attachment limit comfortably covers the two PDF attachments. Zero setup cost |
 
 ---
 
@@ -191,6 +219,8 @@ Record major decisions here so future maintainers understand the *why*.
 | `pdfjs-dist` | v5 → v6 breaking changes | Worker URL import path may change; test PDF upload after upgrade |
 | `express-rate-limit` | v8 already uses `standardHeaders: 'draft-7'` by default | Review limit headers if upgrading major versions |
 | `pdf-lib` | No active major updates as of 2026 | Stable; low upgrade urgency |
+| `http-proxy-middleware` | Stay on v2.x | v3+ dropped CJS support. Only upgrade if server is migrated to ESM output |
 | Node.js | LTS transitions (20 → 22 → 24) | Update Railway runtime; test build after upgrade |
 | Railway pricing | Check dashboard for plan changes | Adjust budget if pricing tiers change |
 | OpenAI pricing | GPT-4o prices have dropped historically | Check platform.openai.com/pricing; update cost table above |
+| Gmail SMTP | 500/day limit | If submission volume exceeds ~400/day, switch to Resend or SendGrid |

@@ -347,16 +347,23 @@ The application is production-ready. Before exposing to the public internet, com
 
 ### Must do
 
-- [ ] **Set `CLIENT_URL`** in `server/.env` to your production domain (e.g. `https://intake.yourdomain.com`) — this locks CORS to your domain
-- [ ] **Set `TURNSTILE_SECRET_KEY`** — get a free site+secret key pair from [dash.cloudflare.com/turnstile](https://dash.cloudflare.com/?to=/:account/turnstile) and add the matching site key to the frontend `ConsentSection.tsx`
-- [ ] **Deploy behind HTTPS** — browsers block camera on plain HTTP. Use Cloudflare, nginx + Let's Encrypt, or your hosting platform's built-in TLS
-- [ ] **Set `NODE_ENV=production`** in your server environment
+- [ ] **Set `CLIENT_URL`** in Railway Variables to your production domain (e.g. `https://scai.yourdomain.com`) — locks CORS to your domain
+- [ ] **Set `TURNSTILE_SECRET_KEY`** — get a free key pair from [dash.cloudflare.com/turnstile](https://dash.cloudflare.com/?to=/:account/turnstile). Set `TURNSTILE_SECRET_KEY` in Railway Variables (server runtime) and `VITE_TURNSTILE_SITE_KEY` in Railway Variables (baked into client bundle at build time — triggers a redeploy)
+- [ ] **Deploy behind HTTPS** — browsers block camera on plain HTTP. Railway provides automatic HTTPS on `.up.railway.app` domains and custom domains via Let's Encrypt
+- [ ] **Set `NODE_ENV=production`** in Railway Variables
+- [ ] **Add custom domain in Railway** (Settings → Networking → Custom Domains) — Railway must know about the domain to provision its SSL certificate. Adding a CNAME in your DNS alone is not enough
 
 ### Recommended
 
 - [ ] **OpenAI usage alert** — set a monthly budget cap in your OpenAI account dashboard so you get emailed if costs spike
 - [ ] **Uptime monitoring** — point UptimeRobot or Better Uptime at `GET /api/health`
 - [ ] **SMTP SSL** — for handling passport data, prefer explicit SSL: `SMTP_PORT=465`, `SMTP_SECURE=true`
+
+### Railway deployment notes
+
+- **Build installs:** Railway's Nixpacks sets `NODE_ENV=production` during the install phase, which skips `devDependencies`. TypeScript and Vite are `devDependencies` and must be installed for the build to succeed. The `install:all` script uses `--include=dev` to force their installation (already applied)
+- **Port:** Enter `3001` when Railway asks which port your app listens on (both for domain generation and custom domain setup)
+- **Variables:** Use the Raw Editor in Railway's Variables tab to paste all variables at once — adding them one-by-one can silently discard values if you click away without pressing Enter
 
 ### Already handled (no action needed)
 
@@ -365,7 +372,7 @@ The application is production-ready. Before exposing to the public internet, com
 | API authentication | ✅ Session tokens issued after Turnstile verification; `requireSession` middleware on all data routes |
 | Rate limiting | ✅ Three tiers: session (10/15 min), OCR (60/15 min), submit (5/hour) |
 | CORS | ✅ Locked to `CLIENT_URL` env var |
-| Security headers | ✅ `helmet()` applied (HSTS, X-Frame-Options, X-Content-Type-Options, etc.) |
+| Security headers | ✅ `helmet()` with custom CSP — allows `challenges.cloudflare.com` for Turnstile; blocks everything else |
 | Submission deduplication | ✅ In-memory map with 24-hour TTL rejects repeat `submissionId` |
 | Input validation | ✅ `documentId` checked against `VALID_DOCUMENT_IDS` whitelist before any processing |
 | No disk writes | ✅ PDFs generated in memory and passed directly to nodemailer |
