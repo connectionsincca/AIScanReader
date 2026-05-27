@@ -214,7 +214,7 @@ export default function DocumentScanner() {
         <div className="flex-1">
           <h2 className="text-base font-semibold text-gray-900">Document Scanning</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Declare your travelers, then scan each document. AI will extract your information automatically.
+            Declare your travelers, then scan each document.
           </p>
         </div>
         {processedCount > 0 && (

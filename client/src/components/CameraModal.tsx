@@ -116,6 +116,14 @@ export default function CameraModal({
 
   useEffect(() => { startCamera(); return () => stopCamera(); }, [startCamera, stopCamera]);
 
+  // Issue 1 fix: lock body scroll while modal is open so the page behind
+  // doesn't jump to the top when the modal mounts/unmounts.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   // FIX: video element stays in DOM always (just hidden) — re-attach stream if
   // srcObject was lost (e.g. video element just became visible after being hidden).
   useEffect(() => {
@@ -283,11 +291,17 @@ export default function CameraModal({
     setModalStep('preview');
   }, [rawPhotoUrl, corners]);
 
-  const backToCamera = useCallback((msg = 'Place document inside the frame and hold steady.') => {
+  const backToCamera = useCallback((
+    msg  = 'Place document inside the frame and hold steady.',
+    type: QualityFeedback['type'] = 'info',
+  ) => {
     setRawPhotoUrl('');
     setPreviewUrl('');
     setModalStep('camera');
-    setFeedback({ message: msg, type: 'info' });
+    feedbackLockRef.current = type === 'error' || type === 'warning'
+      ? Date.now() + 6000   // hold error/warning visible for 6 s
+      : 0;
+    setFeedback({ message: msg, type });
   }, []);
 
   // ── Preview ───────────────────────────────────────────────────────────────────
@@ -324,7 +338,7 @@ export default function CameraModal({
     setValidationMsg('Checking document type…');
     try {
       const r = await validateScan({ documentId, imageBase64: dataUrlToBase64(previewUrl) });
-      if (!r.valid) { backToCamera(r.message); return; }
+      if (!r.valid) { backToCamera(r.message, 'error'); return; }
       if (r.validationSkipped) {
         // Show warning on preview step — user must tap "Use anyway" or "Retake"
         setModalStep('preview');
@@ -436,7 +450,8 @@ export default function CameraModal({
             </div>
           ) : (
             /* ── Portrait: bottom bar ── */
-            <div className="flex-shrink-0 bg-black px-4 pt-2.5 pb-5">
+            <div className="flex-shrink-0 bg-black px-4 pt-2.5"
+              style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
               <p className={`text-center text-xs mb-3 min-h-[16px] ${
                 feedback.type === 'error'   ? 'text-red-400'   :
                 feedback.type === 'warning' ? 'text-amber-400' :
@@ -597,7 +612,8 @@ export default function CameraModal({
           </div>
 
           {/* Actions */}
-          <div className="flex-shrink-0 flex items-center gap-2 px-4 pt-3 pb-5 bg-black">
+          <div className="flex-shrink-0 flex items-center gap-2 px-4 pt-3 bg-black"
+            style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
             <button onClick={() => backToCamera()}
               className="flex-1 py-3 rounded-xl border border-white/30 text-white text-sm font-medium active:bg-white/10">
               Retake

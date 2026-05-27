@@ -100,7 +100,8 @@ export default function SubmitSection() {
 
     if (missingFields.length > 0) {
       setSubmitAttempted(true);
-      setLocalError(`Please complete highlighted fields in the form above before submitting. ${missingFields.length} field${missingFields.length !== 1 ? 's' : ''} missing.`);
+      // Don't bake the count into the string — it's shown live in the summary card above
+      setLocalError('Please complete the highlighted fields in the form above before submitting.');
       return;
     }
 
@@ -138,8 +139,11 @@ export default function SubmitSection() {
         setLocalError(result.message || 'Submission failed. Please try again.');
       }
     } catch (err) {
-      const msg = (err as Error).message ?? '';
-      if (msg.includes('Network') || msg.includes('timeout')) {
+      const status = (err as { response?: { status: number } }).response?.status;
+      const msg    = (err as Error).message ?? '';
+      if (status === 401) {
+        setLocalError('Your session has expired. Please refresh the page and start again from Step 1.');
+      } else if (msg.includes('Network') || msg.includes('timeout')) {
         setLocalError('Connection error. Please check your internet connection and try again.');
       } else {
         setLocalError('Submission failed. Please try again in a few moments.');
@@ -186,9 +190,13 @@ export default function SubmitSection() {
         </div>
         <div>
           <p className="text-xs text-gray-500">Status</p>
-          <p className="text-sm font-medium text-brand-600">
-            {missingFields.length === 0 ? 'Ready to submit' : `${missingFields.length} field${missingFields.length !== 1 ? 's' : ''} missing`}
-          </p>
+          {missingFields.length === 0 ? (
+            <p className="text-sm font-medium text-green-600">Ready to submit</p>
+          ) : (
+            <p className="text-sm font-medium text-red-600">
+              {missingFields.length} field{missingFields.length !== 1 ? 's' : ''} missing
+            </p>
+          )}
         </div>
       </div>
 
