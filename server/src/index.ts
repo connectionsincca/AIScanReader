@@ -15,6 +15,11 @@ import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
+// Trust the first reverse proxy (ngrok in dev, Railway/Cloudflare in prod).
+// Required so express-rate-limit can read the real client IP from
+// X-Forwarded-For instead of throwing ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+app.set('trust proxy', 1);
+
 // ── Middleware ────────────────────────────────────────────────────────────────
 
 app.use(helmet());
