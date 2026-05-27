@@ -325,8 +325,9 @@ function rowYN(
 // EW: inst=115, hrs=42, field=88, city=88, cert=123 → 115+42+88+88+123=456 ✓
 const EW = [26, 24, 26, 24, 115, 42, 88, 88, 123];
 
-// WW: emp=100, title=82, type=45, sal=42, city=80, resp=82, qual=25 → sum=456 ✓
-const WW = [26, 24, 26, 24, 100, 82, 45, 42, 80, 82, 25];
+// WW: 9 cols — ratios matched to reference PDF screenshot (UW=556)
+// From(yr37,mo50) + To(yr37,mo50) + employer82 + hrs/week71 + position71 + city74 + qualified84
+const WW = [37, 50, 37, 50, 82, 71, 71, 74, 84];
 
 // AW: addr=148, hrs=40, own=74, city=72, act=122 → 148+40+74+72+122=456 ✓
 const AW = [26, 24, 26, 24, 148, 40, 74, 72, 122];
@@ -376,9 +377,10 @@ function drawEduRow(page: PDFPage, y: number, e: EduEntry, fR: PDFFont) {
 
 function drawWorkRow(page: PDFPage, y: number, e: WorkEntry, fR: PDFFont) {
   const [sy, sm] = ym(e.startDate), [ey, em] = ym(e.endDate);
-  const vals = [sy, sm, ey, em, e.employer, e.jobTitle, e.jobType, e.salary, e.cityCountry, e.responsibilities, ''];
+  // 9 cols: yr mo yr mo | employer | hrs/week(jobType) | position(jobTitle) | city | when-qualified(responsibilities)
+  const vals = [sy, sm, ey, em, e.employer, e.jobType, e.jobTitle, e.cityCountry, e.responsibilities];
   let cx = ML;
-  for (let i = 0; i < WW.length; i++) { cell(page, cx, y, WW[i], CR, vals[i], C.white, fR, 7.5); cx += WW[i]; }
+  for (let i = 0; i < WW.length; i++) { cell(page, cx, y, WW[i], CR, vals[i] ?? '', C.white, fR, 7.5); cx += WW[i]; }
 }
 
 function drawAddrRow(page: PDFPage, y: number, r: AddrRow, fR: PDFFont) {
@@ -686,9 +688,7 @@ export async function generateFormPdf(
       'Name of Employer/ Name of Manager',
       'Number of Years/ Number of hours/week',
       'Position/ Occupation/ Title/NOC',
-      'Salary',
       'City and Country/ Complete Address',
-      'Responsibilities',
       'When you became qualified for this job',
     ], WW, fB);
 
