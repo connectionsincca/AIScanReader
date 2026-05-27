@@ -116,24 +116,6 @@ export default function CameraModal({
 
   useEffect(() => { startCamera(); return () => stopCamera(); }, [startCamera, stopCamera]);
 
-  // Scroll-lock: save scroll position, pin the body in place, restore on close.
-  // Simply setting overflow:hidden resets scrollY to 0 on mobile — this pattern
-  // keeps the page visually in place while the modal is open, then jumps back.
-  useEffect(() => {
-    const scrollY = window.scrollY;
-    const body = document.body;
-    body.style.position   = 'fixed';
-    body.style.top        = `-${scrollY}px`;
-    body.style.width      = '100%';
-    body.style.overflowY  = 'scroll'; // keep scrollbar width so layout doesn't shift
-    return () => {
-      body.style.position  = '';
-      body.style.top       = '';
-      body.style.width     = '';
-      body.style.overflowY = '';
-      window.scrollTo(0, scrollY);   // restore exact position
-    };
-  }, []);
 
   // FIX: video element stays in DOM always (just hidden) — re-attach stream if
   // srcObject was lost (e.g. video element just became visible after being hidden).
@@ -373,7 +355,15 @@ export default function CameraModal({
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black" style={{ height: '100dvh' }}>
+    /* Backdrop — dark overlay over whatever the user is currently looking at */
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70">
+
+    {/* Bottom-sheet card — slides up from the bottom of the current viewport.
+        93svh = 93% of the SMALL viewport height, which is the most conservative
+        measure: guaranteed to fit even when the browser toolbar is fully visible.
+        Rounded top corners make it clear this is a popup, not a new page.      */}
+    <div className="w-full flex flex-col bg-black rounded-t-2xl overflow-hidden"
+         style={{ height: '93svh' }}>
 
       {/* Top bar */}
       <div className="flex-shrink-0 flex items-center justify-between px-4 bg-black" style={{ height: 44 }}>
@@ -687,6 +677,8 @@ export default function CameraModal({
           <p className="text-white text-sm">{validationMsg}</p>
         </div>
       )}
-    </div>
+
+    </div>{/* end card */}
+    </div>/* end backdrop */
   );
 }
