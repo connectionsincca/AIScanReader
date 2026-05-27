@@ -215,9 +215,9 @@ export default function IntakeForm() {
 
   // ── Parent / sibling validation helpers ────────────────────────────────────
 
-  // All PersonRow fields except passportInfo are mandatory for parents
+  // All PersonRow fields except familyName and passportInfo are mandatory for parents
   const PARENT_REQUIRED_KEYS: Array<keyof PersonRow> = [
-    'familyName', 'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
+    'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
     'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage',
     'address', 'nativeLang', 'occupation',
   ];

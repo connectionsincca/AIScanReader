@@ -29,9 +29,9 @@ interface PersonRow {
   nativeLang?: string; occupation?: string;
 }
 
-// All parent fields except passportInfo are mandatory
+// All parent fields except familyName and passportInfo are mandatory
 const PARENT_REQUIRED_KEYS: Array<keyof PersonRow> = [
-  'familyName', 'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
+  'givenNames', 'dob', 'placeOfBirth', 'countryOfResidence',
   'citizenship', 'emailPhone', 'maritalStatus', 'dateOfMarriage',
   'address', 'nativeLang', 'occupation',
 ];
