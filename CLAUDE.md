@@ -28,6 +28,18 @@ There are no test scripts. TypeScript compilation (`tsc`) is the primary correct
 
 In development, always access the app via **http://localhost:3001** — not the Vite port. Express detects that `client/dist/` does not exist and transparently reverse-proxies all non-`/api` requests (including Vite HMR websockets) to Vite on `:5174`. In production, Express serves the built `client/dist/` as static files directly.
 
+### Security layer
+
+All production security concerns are already implemented:
+
+- **`helmet()`** — HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and other security headers set in `server/src/index.ts`
+- **CORS** — locked to `config.clientUrl` (from `CLIENT_URL` env var, not `origin: '*'`)
+- **Session auth** — Cloudflare Turnstile bot-protection on the consent step. `POST /api/session` verifies the Turnstile token and issues a 64-char hex session token (4-hour TTL). All `/api/documents/*` and `/api/submit` routes require `requireSession` middleware (`server/src/middleware/auth.ts`). Sessions live in an in-memory Map in `server/src/services/sessionStore.ts`
+- **Rate limiting** — three-tier via `express-rate-limit`: session creation (10/15 min), OCR endpoints (60/15 min), submit (5/hour)
+- **Input validation** — `documentId` checked against `VALID_DOCUMENT_IDS` whitelist before use as object key
+- **Deduplication** — `submissionId` (UUID generated client-side) tracked in-memory with 24-hour TTL; duplicate submits return 409
+- **`.env.example`** — template file exists at `server/.env.example`
+
 ### Data flow — document input to submission
 
 Documents can be added via two paths, both ultimately produce `PageData[]` (base64 JPEG data URLs with size metadata):
@@ -48,13 +60,14 @@ File input (image or PDF)
   → per-page size check  ≤ 1 MB after rendering
 
 ── Shared path (both camera and upload) ─────────────────────────────────────
-validateScan API        GPT-4o (low detail) — checks document type matches
-extractData API         GPT-4o (high detail) — OCR extracts form fields
+POST /api/session        Turnstile token → 4-hour session token (consent step)
+validateScan API         GPT-4o (low detail) — checks document type matches
+extractData API          GPT-4o (high detail) — OCR extracts form fields
   → AppContext.applyExtracted()   merges into formData, higher confidence wins
-  → submitPackage API   server generates TWO PDFs in parallel:
-                          • documentsPdf  — all scanned page images
-                          • formPdf       — completed intake form data
-                        both passed directly to nodemailer → no disk write
+  → submitPackage API    server generates TWO PDFs in parallel:
+                           • documentsPdf  — all scanned page images
+                           • formPdf       — completed intake form data
+                         both passed directly to nodemailer → no disk write
 ```
 
 Size guardrails live in `client/src/config/limits.ts`: `MAX_PAGE_BYTES = 1 MB`, `MAX_TOTAL_BYTES = 22 MB`. Both are enforced in `CameraModal` (on capture) and `DocumentRow` (on upload). A cumulative progress bar with amber/red warning states is shown in `DocumentScanner`.
@@ -93,7 +106,7 @@ The `APPLY_EXTRACTED` action merges OCR results only when the new confidence exc
 
 Handles both camera and file upload for a single document. Key behaviours:
 
-- **"Use Passport as Address Proof"** — shown only for `addressProof` when passport is already done. Clones passport `PageData[]` with fresh UUIDs (no shared references) and marks the document done without re-running OCR. A hint tells the user to fill the address manually (passports don't always contain a residential address, though Indian passports may — the server-side `currentAddress` field is included in passport `EXTRACT_FIELDS` as an optional extraction target).
+- **"Use Passport as Address Proof"** — shown only for `addressProof` when passport is already done. Clones passport `PageData[]` with fresh UUIDs (no shared references) and marks the document done without re-running OCR. A hint tells the user to fill the address manually.
 - **PDF upload** — uses `pdfToImages()` from `client/src/utils/pdfUtils.ts` (pdfjs-dist v5). Worker URL: `new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href`. pdfjs v5 requires the `canvas` parameter in `page.render({ canvasContext, viewport, canvas })`.
 - **Affidavit note** — shown on `degreeCertificate` when `educationHistory` has no post-secondary entries, suggesting a notarized letter instead.
 
@@ -115,17 +128,38 @@ The most complex component. Key design decisions:
 ### Server services (`server/src/services/`)
 
 - **`openaiService.ts`** — `DOC_VISUAL_TRAITS` contains per-document-type visual descriptions injected into the validation prompt so GPT-4o can distinguish document types. `EXTRACT_FIELDS` defines the exact fields (and JSON schema for arrays like `workHistory`) returned by extraction. Both functions fail gracefully: `validateDocumentScan` returns `validationSkipped: true` on error; `extractDocumentData` returns empty data rather than throwing.
-- **`pdfService.ts`** — builds both PDFs entirely in memory using `pdf-lib`. No disk writes.
+- **`pdfService.ts`** — builds both PDFs entirely in memory using `pdf-lib`. Page size is US Letter (`[612, 792]`). Key layout constants: `ML=28, MR=28, UW=556` (usable width). Work-table column widths (`WW`): 9 columns summing to 556 — `[37,50,37,50,82,71,71,74,84]`. Address-table column widths (`AW`): 9 columns — `[37,50,37,50,104,67,57,74,80]`. Employment table renders a minimum of 12 rows. The `PersonRow` interface includes an `accompanying` field; Pages 5/6/7 render Accompanying radio buttons (text label above, filled circle below) with dash under the Applicant column, real Yes/No values for spouse and children.
 - **`emailService.ts`** — attaches PDF buffers directly to nodemailer without writing to disk.
+- **`sessionStore.ts`** — in-memory Map of `{ createdAt }` keyed by 64-char hex token; `isValid()` enforces 4-hour TTL.
 
 ### `IntakeForm` (`client/src/components/IntakeForm.tsx`)
 
 Renders a 7-page Tanon Immigration Detailed Information Sheet. Key points:
 
 - **`fi(key, type?)`** helper renders a form input bound to `formData[key]`. When `submitAttempted` is true and the field is required and empty, it applies a thick red full-border (`border-2 border-red-500 rounded`) instead of the normal bottom-border underline.
+- **`accompanyingRadio(value, onChange)`** helper — renders "Yes / No" radio pair with text label above and radio circle below. Used on Pages 5, 6, and 7. No radio button is shown under the Applicant column.
+- **Spouse fields** — all spouse-specific `FormData` keys (`spouseCountryOfResidence`, `spouseEmailPhone`, `spouseMaritalStatus`, `spouseDateOfMarriage`, `spouseAddress`, `spouseNativeLanguage`) are bound via `fi()` and included in `requiredKeys` when `travelers.hasSpouse` is true.
+- **Auto-default accompanying** — `useEffect` sets `spouseAccompanying = 'yes'` when `travelers.hasSpouse` is set; sets `child1–4Accompanying = 'yes'` for each declared child. Defaults happen only once (when the field is empty).
 - **Address row 0 auto-fill** — a `useEffect` syncs `formData.currentAddress` into `addrRows[0].address` whenever the address proof OCR populates it.
+- **Work history table** — 6 columns: No., Employer, Job Title, Job Type, Start Date, End Date. Salary and Responsibilities columns are excluded from the HTML form (but still extracted into `formData.workHistory` JSON for the PDF).
+- **Yes/No rows (Page 1)** — IRCC applied before, PNP applied before, Relative in Canada — each has a separate "Provide Details" cell bound to `irccAppliedDetails`, `pnpAppliedDetails`, `relativeInCanadaDetails`.
 - `workHistory` and `educationHistory` are stored as JSON strings in `formData` and parsed locally within the component for the editable table rows.
-- No source badge indicators (PASSPORT / MANUAL etc.) — those were removed. Fields auto-filled by OCR are shown in blue text (`text-blue-900 font-medium`).
+- Fields auto-filled by OCR are shown in blue text (`text-blue-900 font-medium`).
+
+### `PersonRow` interface (shared across `IntakeForm` and `pdfService`)
+
+```typescript
+interface PersonRow {
+  name: string;
+  dob: string;
+  cityCountry: string;
+  citizenship: string;
+  occupation: string;
+  accompanying: string;  // 'yes' | 'no' | ''
+}
+```
+
+Used for father, mother, spouse-father, spouse-mother, and siblings. The `accompanying` field is rendered as a radio in the PDF and as `accompanyingRadio()` in the HTML form.
 
 ### Reference documents
 
@@ -140,16 +174,4 @@ Renders a 7-page Tanon Immigration Detailed Information Sheet. Key points:
 
 ## Environment
 
-`server/.env` is required to start the server (all variables validated at boot via `require_env()`). Required variables: `OPENAI_API_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `AGENCY_EMAIL`. Optional: `PORT` (default 3001), `CLIENT_URL` (default http://localhost:5173). The OpenAI key must have gpt-4o access. Camera scanning requires HTTPS in production — use ngrok for local mobile testing (`ngrok http 3001`).
-
-## Production readiness gaps
-
-The following are **not yet implemented** and are required before public deployment:
-
-- **Authentication** — all `/api/*` routes are currently open (no token/session check)
-- **Rate limiting** — no `express-rate-limit` on OCR or submit endpoints; OpenAI quota can be exhausted by repeated calls
-- **CORS** — currently `origin: '*'` in `server/src/index.ts`; must be locked to the production domain before launch
-- **Security headers** — HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy not set
-- **Submission deduplication** — the same `submissionId` can be submitted multiple times, sending duplicate emails
-- **Input validation** — `documentId` is not checked against a whitelist on the server before being used as an object key
-- **`.env.example`** — no template file exists; new deployments must be configured manually from the README
+`server/.env` is required to start the server (all variables validated at boot via `require_env()`). Required variables: `OPENAI_API_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `AGENCY_EMAIL`, `TURNSTILE_SECRET_KEY`. Optional: `PORT` (default 3001), `CLIENT_URL` (default http://localhost:5173). A template is at `server/.env.example`. The OpenAI key must have gpt-4o access. Camera scanning requires HTTPS in production — use ngrok for local mobile testing (`ngrok http 3001`).

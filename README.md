@@ -18,7 +18,7 @@ A web application that lets immigration applicants scan or upload their document
 8. [Project structure](#project-structure)
 9. [API endpoints](#api-endpoints)
 10. [Cost per submission](#cost-per-submission)
-11. [Before going live — gaps to fill](#before-going-live--gaps-to-fill)
+11. [Going live checklist](#going-live-checklist)
 
 ---
 
@@ -27,7 +27,7 @@ A web application that lets immigration applicants scan or upload their document
 The applicant goes through four steps in order:
 
 ### Step 1 — Consent
-The applicant reads and accepts four consent statements covering data processing, no permanent storage, automated extraction, and agency submission. All four must be checked to proceed.
+The applicant reads and accepts four consent statements covering data processing, no permanent storage, automated extraction, and agency submission. All four must be checked to proceed. A Cloudflare Turnstile widget verifies the user is human before a session token is issued.
 
 ### Step 2 — Document Scanning
 1. The applicant declares all travelers (themselves + optional spouse + up to 4 children).
@@ -47,29 +47,27 @@ The applicant reads and accepts four consent statements covering data processing
 A 7-page **Tanon Immigration Detailed Information Sheet** is shown, pre-filled with everything extracted from the scanned documents (shown in blue). The applicant reviews, corrects, and completes any remaining fields. Required fields that are empty get a thick red border when the Submit button is clicked.
 
 The form covers:
-- Page 1: Personal details, passport info, address, education summary, yes/no questions
+- Page 1: Personal details, passport info, address, education summary, yes/no questions (deported, IRCC, PNP, relative in Canada — each with a "Provide Details" field)
 - Page 2: Education history table + IELTS / CELPIP language test scores
-- Page 3: Employment history table (auto-sorted, gap detection)
-- Page 4: Address history (last 10 years, row 0 auto-filled from address proof)
-- Page 5: Details of all travelers side-by-side (applicant, spouse, children)
-- Page 6: Brothers and sisters details
-- Page 7: Parents details + Canada entry dates
+- Page 3: Employment history table (auto-sorted most-recent-first, gap detection)
+- Page 4: Address history (last 10 years, row 0 auto-filled from address proof scan)
+- Page 5: All travelers side-by-side (applicant, spouse, up to 4 children) with Accompanying radio buttons
+- Page 6: Brothers and sisters details (up to 5) with Accompanying radio buttons
+- Page 7: Parents details (applicant's father/mother, spouse's father/mother) with Accompanying radio buttons + Canada entry dates
 
 > **Reference files for the form layout:**
-> `docs/tanan_immigration_form_v2.html` is the original HTML version of the Detailed Information Sheet that this web form is based on. Open it in a browser to see the exact field names, table layouts, and section order that the digital form replicates. If you ever need to understand why a specific field exists, or want to restructure a page, this file is the ground truth. `docs/Detailed Information_Tenon (4).pdf` is the physical paper version the agency uses — useful for confirming how the final printed output should look.
+> `docs/tanan_immigration_form_v2.html` is the original HTML version of the Detailed Information Sheet this web form is based on. `docs/Detailed Information_Tenon (4).pdf` is the physical paper version the agency uses — the generated PDF is formatted to match it (US Letter, matching column widths).
 
-### Step 4 — Submit
+### Step 4 — Review & Submit
 The system performs final checks:
 - **Blocking:** spouse or child names entered but no passport uploaded → submission prevented
 - **Advisory:** employment/education history entered but no proof documents uploaded → amber warning shown (submission still allowed)
 
-On submit, the server generates two PDFs in memory and emails them to the agency:
-- **Documents PDF** — all scanned pages, labelled
-- **Form PDF** — the completed Detailed Information Sheet
+On submit, the server generates two PDFs entirely in memory and emails them to the agency:
+- **Documents PDF** — all scanned pages, labelled by document name
+- **Form PDF** — the completed 7-page Detailed Information Sheet (US Letter, matching reference format)
 
-A success screen confirms the submission ID.
-
-**← Back button** is available on steps 2 and 3 (top of the progress bar) so applicants can return to the previous step at any time.
+A success screen confirms the submission ID. **← Back** is available on steps 2 and 3.
 
 ---
 
@@ -78,6 +76,13 @@ A success screen confirms the submission ID.
 ```
 Browser (React + Vite)                 Server (Node.js + Express)
 ──────────────────────────             ──────────────────────────────────
+Consent + Turnstile widget
+  │                                    POST /api/session
+  └─ Turnstile token              ──►  Verify with Cloudflare API
+                                  ◄──  { sessionToken }  (4-hour TTL)
+                                       All subsequent calls send:
+                                       x-session-token: <token>
+
 Document scan/upload
   │
   ├─ Camera path:                      POST /api/validate-scan
@@ -96,15 +101,15 @@ Document scan/upload
 User reviews & submits form            POST /api/submit
   send formData + all pages       ──►  Generate documentsPDF (pdf-lib, in memory)
                                        Generate formPDF      (pdf-lib, in memory)
-                                       nodemailer → agency email with 2 PDF attachments
-                                  ◄──  { success: true, submissionId }
+                                       nodemailer → agency email with 2 PDFs
+                                  ◄──  { success: true }
 ```
 
 In **development**, both servers run simultaneously:
 - Vite dev server on `:5174` (React, HMR)
-- Express on `:3001` (API + proxy to Vite)
+- Express on `:3001` (API + transparent proxy to Vite)
 
-Always open **http://localhost:3001** in your browser — Express auto-proxies to Vite when `client/dist/` doesn't exist.
+Always open **http://localhost:3001** — Express auto-proxies to Vite when `client/dist/` doesn't exist.
 
 In **production**, run `npm run build` then start Express only — it serves the built React files as static assets from `client/dist/`.
 
@@ -122,7 +127,7 @@ In **production**, run `npm run build` then start Express only — it serves the
 | Degree / Diploma Certificate | Required if higher education claimed | Education history |
 | IELTS Score Sheet | Optional | All band scores and dates |
 | CELPIP Score Sheet | Optional | All component scores and dates |
-| Bank Statement | Optional | Upload only (no extraction) |
+| Bank Statement | Optional | Upload only |
 | Salary Slips | Optional | Upload only |
 | Tax Return / ITR | Optional | Upload only |
 | Net Worth Statement | Optional | Upload only |
@@ -133,7 +138,7 @@ In **production**, run `npm run build` then start Express only — it serves the
 | Digital Picture | Optional | Upload only |
 
 ### Spouse / Partner (if declared)
-Passport (required for spouse), Work Experience Certificate, Degree Certificate, Event Invitation Letter, Travel Tickets, Digital Picture.
+Passport (required), Work Experience Certificate, Degree Certificate, Event Invitation Letter, Travel Tickets, Digital Picture.
 
 ### Each Child (up to 4, if declared)
 Passport (required per child), Travel Tickets, Digital Picture.
@@ -151,14 +156,18 @@ Passport (required per child), Travel Tickets, Digital Picture.
 | Email | `nodemailer` (SMTP) |
 | PDF upload rendering | `pdfjs-dist` v5 (client-side, canvas) |
 | Camera processing | Custom perspective transform + homography (no external lib) |
+| Bot protection | Cloudflare Turnstile (CAPTCHA-free human verification) |
+| Rate limiting | `express-rate-limit` (3-tier: session / OCR / submit) |
+| Security headers | `helmet` |
 
 ---
 
 ## Prerequisites
 
 - **Node.js 18+**
-- **OpenAI API key** with GPT-4o access (get one at [platform.openai.com](https://platform.openai.com/api-keys))
+- **OpenAI API key** with GPT-4o access ([platform.openai.com](https://platform.openai.com/api-keys))
 - **SMTP credentials** — Gmail App Password works fine for testing
+- **Cloudflare Turnstile keys** — free at [dash.cloudflare.com/turnstile](https://dash.cloudflare.com/?to=/:account/turnstile) (optional for local dev — omit to skip verification)
 
 ---
 
@@ -174,29 +183,26 @@ npm run install:all
 
 ### 2. Configure environment
 
-Create `server/.env` (the server will refuse to start without it):
+Copy the template and fill in your values:
+
+```bash
+cp server/.env.example server/.env
+```
+
+Minimum required for local development:
 
 ```env
-PORT=3001
 NODE_ENV=development
-
-# OpenAI — must have GPT-4o access
 OPENAI_API_KEY=sk-proj-YOUR_KEY_HERE
 
-# SMTP — Gmail example (use App Password, not your main password)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your@gmail.com
 SMTP_PASS=your-16-char-app-password
-SMTP_FROM_NAME=Tanon Immigration Portal
 SMTP_FROM=noreply@yourdomain.com
 
-# Where completed intake packages are sent
 AGENCY_EMAIL=intake@immigrationagency.com
-
-# Frontend URL for CORS (development default)
-CLIENT_URL=http://localhost:5173
 ```
 
 **Gmail App Password setup:**
@@ -213,10 +219,11 @@ npm run dev
 
 Open **http://localhost:3001** in your browser.
 
-### 4. Test on a phone (camera scanning requires HTTPS)
+> **Turnstile in development:** When `TURNSTILE_SECRET_KEY` is unset (or set to the Cloudflare test key `1x0000...AA`), the human-verification step is skipped automatically. The consent page still shows the widget but it auto-passes.
+
+### 4. Test on a phone (camera requires HTTPS)
 
 ```bash
-# Install ngrok if you haven't: https://ngrok.com/download
 ngrok http 3001
 ```
 
@@ -229,16 +236,17 @@ Use the `https://...ngrok-free.app` URL on your phone. Camera access requires HT
 | Variable | Required | Description |
 |---|---|---|
 | `OPENAI_API_KEY` | ✅ | OpenAI key with GPT-4o access |
-| `SMTP_HOST` | ✅ | SMTP server (e.g. `smtp.gmail.com`) |
+| `SMTP_HOST` | ✅ | SMTP server hostname |
 | `SMTP_PORT` | ✅ | `587` for STARTTLS, `465` for SSL |
-| `SMTP_SECURE` | ✅ | `false` for STARTTLS (port 587), `true` for SSL (port 465) |
-| `SMTP_USER` | ✅ | SMTP username / email address |
+| `SMTP_SECURE` | ✅ | `false` for port 587, `true` for port 465 |
+| `SMTP_USER` | ✅ | SMTP login username |
 | `SMTP_PASS` | ✅ | SMTP password or App Password |
-| `SMTP_FROM` | ✅ | Sender address shown on emails |
-| `AGENCY_EMAIL` | ✅ | Destination inbox for all submissions |
-| `SMTP_FROM_NAME` | No | Display name (default: `Immigration Portal`) |
-| `CLIENT_URL` | No | Frontend URL for CORS (default: `http://localhost:5173`) |
+| `SMTP_FROM` | ✅ | Sender address shown on agency emails |
+| `AGENCY_EMAIL` | ✅ | Destination inbox for all submission packages |
+| `SMTP_FROM_NAME` | No | Display name on emails (default: `Immigration Portal`) |
+| `CLIENT_URL` | No | Frontend URL for CORS (default: `http://localhost:5173`) — **set to your production domain in prod** |
 | `PORT` | No | Server port (default: `3001`) |
+| `TURNSTILE_SECRET_KEY` | No | Cloudflare Turnstile secret — omit for local dev (skips verification). **Required in production.** |
 
 ---
 
@@ -249,41 +257,51 @@ AIScanReader/
 ├── client/                        React frontend (Vite + TypeScript)
 │   └── src/
 │       ├── components/
-│       │   ├── CameraModal.tsx    Camera scan UI with perspective correction
-│       │   ├── DocumentRow.tsx    Single document row: scan, upload, status
-│       │   ├── DocumentScanner.tsx  All documents grouped by traveler
-│       │   ├── IntakeForm.tsx     7-page Tanon immigration form
-│       │   ├── ProgressSteps.tsx  Step indicator + ← Back navigation
-│       │   ├── SubmitSection.tsx  Final checks + submit button
-│       │   ├── TravelerPanel.tsx  Declare spouse + children
-│       │   └── ...
+│       │   ├── CameraModal.tsx       Camera scan UI with perspective correction
+│       │   ├── ConsentSection.tsx    Step 1: consent + Turnstile widget
+│       │   ├── DocumentRow.tsx       Single document: scan, upload, status
+│       │   ├── DocumentScanner.tsx   All documents grouped by traveler
+│       │   ├── IntakeForm.tsx        7-page Tanon immigration form
+│       │   ├── ProgressSteps.tsx     Step indicator + ← Back navigation
+│       │   ├── ReviewSection.tsx     Step 4: review summary + confirm send
+│       │   ├── SubmitSection.tsx     Final validation + continue to review
+│       │   ├── SuccessScreen.tsx     Post-submission confirmation
+│       │   └── TravelerPanel.tsx     Declare spouse + up to 4 children
 │       ├── config/
-│       │   ├── documents.ts       All document definitions (id, name, fields)
-│       │   └── limits.ts          MAX_PAGE_BYTES (1 MB), MAX_TOTAL_BYTES (22 MB)
+│       │   ├── documents.ts          Document definitions (id, name, fields)
+│       │   └── limits.ts             MAX_PAGE_BYTES (1 MB), MAX_TOTAL_BYTES (22 MB)
 │       ├── context/
-│       │   └── AppContext.tsx     Single useReducer — all app state
+│       │   └── AppContext.tsx        Single useReducer — all app state
+│       ├── types/
+│       │   └── index.ts              FormData, DocumentId, AppState interfaces
 │       └── utils/
-│           ├── api.ts             Axios wrappers for backend calls
-│           ├── imageAnalysis.ts   Blur/dark detection, size helpers
-│           ├── pdfUtils.ts        PDF → JPEG rendering (pdfjs-dist v5)
-│           └── perspectiveTransform.ts  Camera warp + scan effect
+│           ├── api.ts                API calls (session, scan, extract, submit)
+│           ├── imageAnalysis.ts      Blur/dark detection, base64 size helpers
+│           ├── pdfUtils.ts           PDF → JPEG rendering (pdfjs-dist v5)
+│           └── perspectiveTransform.ts  Homography warp + contrast stretch
 │
 ├── server/                        Express backend (TypeScript)
 │   └── src/
+│       ├── middleware/
+│       │   ├── auth.ts               requireSession — validates x-session-token header
+│       │   └── errorHandler.ts       Global Express error handler
 │       ├── routes/
-│       │   ├── documents.ts       /api/validate-scan, /api/extract-data
-│       │   └── submission.ts      /api/submit
+│       │   ├── session.ts            POST /api/session (Turnstile verify → token)
+│       │   ├── documents.ts          POST /api/validate-scan, /api/extract-data
+│       │   └── submission.ts         POST /api/submit (PDF gen + email)
 │       ├── services/
-│       │   ├── openaiService.ts   GPT-4o validation + OCR extraction
-│       │   ├── pdfService.ts      PDF generation (pdf-lib)
-│       │   └── emailService.ts    nodemailer email delivery
-│       ├── config.ts              Environment variable validation
-│       └── index.ts               Express setup + dev proxy to Vite
+│       │   ├── openaiService.ts      GPT-4o validation + OCR extraction
+│       │   ├── pdfService.ts         In-memory PDF generation (pdf-lib, US Letter)
+│       │   ├── emailService.ts       nodemailer email + PDF attachment
+│       │   └── sessionStore.ts       In-memory session token store (4h TTL)
+│       ├── config.ts                 Env var validation (fails fast on boot)
+│       └── index.ts                  Express setup, helmet, CORS, rate limiting
 │
 ├── docs/
 │   ├── tanan_immigration_form_v2.html   Original HTML form (layout reference)
-│   └── Detailed Information_Tenon (4).pdf  Reference PDF format
+│   └── Detailed Information_Tenon (4).pdf  Reference PDF (column/layout target)
 │
+├── server/.env.example            Environment variable template
 ├── CLAUDE.md                      Technical guide for AI coding assistants
 └── README.md                      This file
 ```
@@ -292,14 +310,20 @@ AIScanReader/
 
 ## API endpoints
 
-| Method | Endpoint | What it does |
-|---|---|---|
-| `GET` | `/api/health` | Returns `{ ok: true, time: "..." }` — use for uptime monitoring |
-| `POST` | `/api/validate-scan` | Sends one page image to GPT-4o; confirms it matches the expected document type |
-| `POST` | `/api/extract-data` | Sends all pages of a document to GPT-4o; returns extracted field values + confidence scores |
-| `POST` | `/api/submit` | Receives full form data + all document pages; generates two PDFs in memory and emails them to the agency |
+All routes except `/api/health` and `/api/session` require the header:
+```
+x-session-token: <token received from /api/session>
+```
 
-All request/response bodies are JSON. Images are transmitted as base64 strings. The Express body limit is **50 MB**.
+| Method | Endpoint | Auth | Rate limit | What it does |
+|---|---|---|---|---|
+| `GET` | `/api/health` | None | None | Returns `{ ok: true }` — for uptime monitoring |
+| `POST` | `/api/session` | None (Turnstile) | 10 / 15 min / IP | Verifies Turnstile token, issues a 4-hour session token |
+| `POST` | `/api/validate-scan` | Session token | 60 / 15 min / IP | GPT-4o checks one page image matches the expected document type |
+| `POST` | `/api/extract-data` | Session token | 60 / 15 min / IP | GPT-4o OCR extracts form fields from all pages of a document |
+| `POST` | `/api/submit` | Session token | 5 / hour / IP | Generates two PDFs in memory and emails them to the agency |
+
+All bodies are JSON. Images are base64 strings. Express body limit: **50 MB**.
 
 ---
 
@@ -313,136 +337,36 @@ Using OpenAI GPT-4o vision (approximate, subject to OpenAI pricing changes):
 | OCR field extraction (per document, high detail) | ~$0.005–0.015 |
 | **Typical full submission (passport + 4–5 documents)** | **~$0.05–$0.20 USD** |
 
-These are server-side OpenAI API costs, not what the applicant pays. Budget accordingly if volume grows.
+These are server-side OpenAI API costs. Set a usage budget in your OpenAI account dashboard to cap unexpected spikes.
 
 ---
 
-## Before going live — gaps to fill
+## Going live checklist
 
-The application is functionally complete and works correctly in testing. The items below are security and operational requirements that **must be addressed before exposing it to the public internet**.
+The application is production-ready. Before exposing to the public internet, complete these steps:
 
-### 🔴 Must fix — security blockers
+### Must do
 
-#### 1. Add API authentication
-All three API endpoints (`/api/validate-scan`, `/api/extract-data`, `/api/submit`) currently accept requests from anyone. Anyone who finds the URL can trigger expensive GPT-4o calls or send fake submissions to your agency inbox.
+- [ ] **Set `CLIENT_URL`** in `server/.env` to your production domain (e.g. `https://intake.yourdomain.com`) — this locks CORS to your domain
+- [ ] **Set `TURNSTILE_SECRET_KEY`** — get a free site+secret key pair from [dash.cloudflare.com/turnstile](https://dash.cloudflare.com/?to=/:account/turnstile) and add the matching site key to the frontend `ConsentSection.tsx`
+- [ ] **Deploy behind HTTPS** — browsers block camera on plain HTTP. Use Cloudflare, nginx + Let's Encrypt, or your hosting platform's built-in TLS
+- [ ] **Set `NODE_ENV=production`** in your server environment
 
-**What to do:** Add a shared secret header that the frontend sends with every request and the server validates. Alternatively, implement session-based authentication.
+### Recommended
 
-```bash
-npm install express-jwt  # or any session/token library
-```
+- [ ] **OpenAI usage alert** — set a monthly budget cap in your OpenAI account dashboard so you get emailed if costs spike
+- [ ] **Uptime monitoring** — point UptimeRobot or Better Uptime at `GET /api/health`
+- [ ] **SMTP SSL** — for handling passport data, prefer explicit SSL: `SMTP_PORT=465`, `SMTP_SECURE=true`
 
-#### 2. Add rate limiting
-Without rate limiting, a single person (or bot) can repeatedly call the OCR endpoint and exhaust your OpenAI quota within minutes.
+### Already handled (no action needed)
 
-**What to do:**
-```bash
-npm install express-rate-limit
-```
-Apply a limit of ~10 requests/minute per IP on OCR endpoints, ~3/minute on submit.
-
-#### 3. Fix CORS configuration
-Currently the server allows requests from any website (`origin: '*'`). Before launch, lock it to your production domain.
-
-**File to change:** `server/src/index.ts` line 16
-```typescript
-// Change from:
-app.use(cors({ origin: '*', credentials: true }));
-// To:
-app.use(cors({ origin: process.env.CLIENT_URL }));
-```
-
-#### 4. Deploy behind HTTPS
-Browsers block camera access on plain HTTP. The server must be behind an HTTPS reverse proxy in production.
-
-**Options (pick one):**
-- **Cloudflare** (easiest) — proxy your domain through Cloudflare, enable "Full SSL"
-- **nginx** with Let's Encrypt — standard self-hosted approach
-- **AWS/GCP/Azure load balancer** — if deploying to cloud
-
-#### 5. Add HTTP security headers
-Add these response headers to prevent common web attacks:
-
-```typescript
-app.use((req, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
-```
-
-Or install the `helmet` package which does this automatically:
-```bash
-npm install helmet
-app.use(helmet());
-```
-
----
-
-### 🟠 Should fix — important before launch
-
-#### 6. Create `server/.env.example`
-There's no template file — a new developer has to guess the variable names from README. Create `server/.env.example` with placeholder values so setup is one `cp .env.example .env` command.
-
-#### 7. Prevent duplicate submissions
-The same submission ID can be submitted multiple times, sending duplicate emails to the agency. Add a short-lived in-memory set that rejects the same `submissionId` if seen twice within a session window.
-
-#### 8. Sanitize form data in emails
-If an applicant types HTML into a form field (intentionally or by accident), it gets embedded in the HTML email. Run all `formData` values through an HTML-escape function before inserting into email templates.
-
-#### 9. Validate `documentId` server-side
-The server receives `documentId` as a string and uses it directly as an object key without checking it's a valid value. Add a whitelist check:
-```typescript
-const VALID_IDS = new Set(['passport', 'marriageCertificate', 'addressProof', ...]);
-if (!VALID_IDS.has(documentId)) return res.status(400).json({ error: 'Invalid documentId' });
-```
-
-#### 10. Switch SMTP to explicit SSL
-For handling sensitive passport and financial documents, use explicit SSL (port 465) instead of STARTTLS (port 587). Update `.env`:
-```
-SMTP_PORT=465
-SMTP_SECURE=true
-```
-
----
-
-### 🟡 Nice to have — operational improvements
-
-| Item | Why it matters |
+| Concern | Status |
 |---|---|
-| **Dockerfile + docker-compose.yml** | Consistent deploys across environments; avoids "works on my machine" issues |
-| **Error tracking (Sentry)** | Get notified when the server throws an error in production; see stack traces |
-| **Uptime monitoring** | Wire `/api/health` to UptimeRobot or Better Uptime — get alerted if the server goes down |
-| **Structured logging** | Replace `console.error` with a logger that can write to a file or log aggregator, with sensitive fields masked |
-| **Node.js memory limit** | Under heavy load, generating multiple large PDFs can cause out-of-memory crashes. Start Node with `--max-old-space-size=512` |
-| **OpenAI quota alerts** | Set a usage limit on your OpenAI account dashboard so you get an email if costs spike unexpectedly |
-
----
-
-### Summary checklist
-
-```
-Security (must fix before launch)
- □ Add API authentication on all /api/* routes
- □ Add rate limiting (express-rate-limit)
- □ Fix CORS — lock to production domain in CLIENT_URL
- □ Deploy behind HTTPS (Cloudflare / nginx + Let's Encrypt)
- □ Add HTTP security headers (or install helmet)
-
-Important (should fix before launch)
- □ Create server/.env.example
- □ Prevent duplicate submission emails
- □ Sanitize formData HTML in email templates
- □ Validate documentId against whitelist on server
- □ Switch SMTP to port 465 / SMTP_SECURE=true
-
-Operational (nice to have)
- □ Dockerfile + docker-compose.yml
- □ Sentry error tracking
- □ Uptime monitoring on /api/health
- □ Structured logging
- □ Node --max-old-space-size flag
- □ OpenAI usage budget alert
-```
+| API authentication | ✅ Session tokens issued after Turnstile verification; `requireSession` middleware on all data routes |
+| Rate limiting | ✅ Three tiers: session (10/15 min), OCR (60/15 min), submit (5/hour) |
+| CORS | ✅ Locked to `CLIENT_URL` env var |
+| Security headers | ✅ `helmet()` applied (HSTS, X-Frame-Options, X-Content-Type-Options, etc.) |
+| Submission deduplication | ✅ In-memory map with 24-hour TTL rejects repeat `submissionId` |
+| Input validation | ✅ `documentId` checked against `VALID_DOCUMENT_IDS` whitelist before any processing |
+| No disk writes | ✅ PDFs generated in memory and passed directly to nodemailer |
+| `.env.example` | ✅ `server/.env.example` has all variables with descriptions |
