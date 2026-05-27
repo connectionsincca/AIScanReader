@@ -49,10 +49,10 @@ export async function generateDocumentsPdf(documents: SubmittedDocument[]): Prom
 interface EduEntry  { institution: string; fieldOfStudy: string; certificate: string; startDate: string; endDate: string; hrsPerWeek: string; cityCountry: string; }
 interface WorkEntry { employer: string; jobTitle: string; jobType: string; salary: string; startDate: string; endDate: string; cityCountry: string; responsibilities: string; }
 interface AddrRow   { fromYear: string; fromMonth: string; toYear: string; toMonth: string; address: string; ownership: string; cityCountry: string; activity: string; }
-interface PersonRow { familyName: string; givenNames: string; dob: string; placeOfBirth: string; countryOfResidence: string; citizenship: string; emailPhone: string; maritalStatus: string; dateOfMarriage: string; passportInfo: string; address: string; nativeLang: string; occupation: string; }
+interface PersonRow { familyName: string; givenNames: string; dob: string; placeOfBirth: string; countryOfResidence: string; citizenship: string; emailPhone: string; maritalStatus: string; dateOfMarriage: string; passportInfo: string; address: string; nativeLang: string; occupation: string; accompanying: string; }
 interface Travelers { hasSpouse: boolean; childCount: number; }
 
-const EMPTY_PERSON: PersonRow = { familyName:'', givenNames:'', dob:'', placeOfBirth:'', countryOfResidence:'', citizenship:'', emailPhone:'', maritalStatus:'', dateOfMarriage:'', passportInfo:'', address:'', nativeLang:'', occupation:'' };
+const EMPTY_PERSON: PersonRow = { familyName:'', givenNames:'', dob:'', placeOfBirth:'', countryOfResidence:'', citizenship:'', emailPhone:'', maritalStatus:'', dateOfMarriage:'', passportInfo:'', address:'', nativeLang:'', occupation:'', accompanying:'' };
 
 function safeJson<T>(s: string | undefined, def: T): T {
   try { return s ? JSON.parse(s) as T : def; } catch { return def; }
@@ -431,6 +431,7 @@ function applicantRow(fd: Partial<FormData>): PersonRow {
     maritalStatus: v('maritalStatus'), dateOfMarriage: v('dateOfMarriage'),
     passportInfo: `${v('passportNumber')}${v('passportIssuingCountry') ? ' / ' + v('passportIssuingCountry') : ''}`,
     address: v('currentAddress'), nativeLang: v('nativeLanguage'), occupation: v('currentOccupation'),
+    accompanying: '',  // Applicant column always blank
   };
 }
 
@@ -443,6 +444,7 @@ function spouseRow(fd: Partial<FormData>): PersonRow {
     maritalStatus: '', dateOfMarriage: '',
     passportInfo: `${v('spousePassportNumber')}${v('spousePassportIssuingCountry') ? ' / ' + v('spousePassportIssuingCountry') : ''}`,
     address: '', nativeLang: '', occupation: v('spouseCurrentOccupation'),
+    accompanying: v('spouseAccompanying') || 'no',
   };
 }
 
@@ -456,6 +458,7 @@ function childRow(fd: Partial<FormData>, n: 1|2|3|4): PersonRow {
     emailPhone: '', maritalStatus: '', dateOfMarriage: '',
     passportInfo: `${v(`${p}PassportNumber` as keyof FormData)}${v(`${p}PassportIssuingCountry` as keyof FormData) ? ' / ' + v(`${p}PassportIssuingCountry` as keyof FormData) : ''}`,
     address: '', nativeLang: '', occupation: '',
+    accompanying: v(`${p}Accompanying` as keyof FormData) || 'no',
   };
 }
 
@@ -495,21 +498,34 @@ function drawPersonMatrix(
     y -= rowH;
   }
 
-  // Accompanying row
-  const accH = 24;
+  // Accompanying row — text ABOVE, radio circle BELOW; skip Applicant (ci=0)
+  const accH = 26;
   cell(page, ML, y, ATTR_LBL, accH, 'Accompanying', C.lbl, fB, 7.5);
   for (let ci = 0; ci < numPeople; ci++) {
     const cx = ML + ATTR_LBL + ci * colW;
     page.drawRectangle({ x: cx, y: y - accH, width: colW, height: accH, color: mkc(C.white), borderWidth: 0.4, borderColor: mkc(C.border) });
+
+    if (ci === 0) {
+      // Applicant — no radio, just a dash
+      page.drawText('—', { x: cx + colW / 2 - 3, y: y - accH / 2 - 2, size: 8, font: fR, color: mkc([0.65, 0.65, 0.65] as C3) });
+      continue;
+    }
+
     const acc = accompanying[ci] ?? '';
-    // "Yes" radio
-    const yesX = cx + colW * 0.22, radioY = y - accH / 2;
-    drawRadioCircle(page, yesX + 7, radioY, 4.5, acc === 'yes');
-    page.drawText('Yes', { x: yesX, y: radioY - 3, size: 6.5, font: fR, color: mkc(C.black) });
-    // "No" radio
-    const noX = cx + colW * 0.58;
-    drawRadioCircle(page, noX + 6, radioY, 4.5, acc === 'no');
-    page.drawText('No', { x: noX, y: radioY - 3, size: 6.5, font: fR, color: mkc(C.black) });
+    const textY   = y - 5;           // label near top of cell
+    const circleY = y - accH + 7;    // circle near bottom of cell
+
+    // YES — label then circle (left side)
+    const yesLX = cx + colW * 0.10;
+    const yesCX = cx + colW * 0.19 + 4.5;
+    page.drawText('Yes', { x: yesLX, y: textY, size: 6, font: fR, color: mkc(C.black) });
+    drawRadioCircle(page, yesCX, circleY, 4, acc === 'yes');
+
+    // NO — label then circle (right side)
+    const noLX = cx + colW * 0.56;
+    const noCX  = cx + colW * 0.65 + 3;
+    page.drawText('No', { x: noLX, y: textY, size: 6, font: fR, color: mkc(C.black) });
+    drawRadioCircle(page, noCX, circleY, 4, acc === 'no');
   }
   y -= accH;
 
@@ -750,7 +766,14 @@ export async function generateFormPdf(
     const headers  = ['Applicant', 'Spouse', 'Son/ Daughter', 'Son/ Daughter', 'Son/ Daughter', 'Son/ Daughter'];
     const hdrBgs: C3[] = [C.col_app, C.col_trv, C.col_trv, C.col_trv, C.col_trv, C.col_trv];
     const colData  = [personValsP5(applicantRow(formData)), personValsP5(sp), personValsP5(ch1), personValsP5(ch2), personValsP5(ch3), personValsP5(ch4)];
-    const accompanying = ['', '', '', '', '', ''];
+    const accompanying = [
+      '',                              // Applicant — no radio
+      v('spouseAccompanying') || 'no',
+      v('child1Accompanying') || 'no',
+      v('child2Accompanying') || 'no',
+      v('child3Accompanying') || 'no',
+      v('child4Accompanying') || 'no',
+    ];
 
     drawPersonMatrix(page, y, PAGE5_ATTRS, headers, hdrBgs, colData, accompanying, fB, fR);
     drawChrome(page, 5, true, fB, fR);
@@ -773,7 +796,10 @@ export async function generateFormPdf(
       personValsP67(applicantRow(formData)),
       ...Array.from({ length: 5 }, (_, i) => personValsP67(siblings[i] ?? EMPTY_PERSON)),
     ];
-    const accompanying = ['', '', '', '', '', ''];
+    const accompanying = [
+      '',  // Applicant — no radio
+      ...Array.from({ length: 5 }, (_, i) => (siblings[i] ?? EMPTY_PERSON).accompanying || 'no'),
+    ];
 
     drawPersonMatrix(page, y, PAGE67_ATTRS, headers, hdrBgs, colData, accompanying, fB, fR);
     drawChrome(page, 6, true, fB, fR);
@@ -800,7 +826,14 @@ export async function generateFormPdf(
       personValsP67(spFather),
       personValsP67(spMother),
     ];
-    const accompanying = ['', '', '', '', '', ''];
+    const accompanying = [
+      '',                                   // Applicant — no radio
+      father.accompanying   || 'no',
+      mother.accompanying   || 'no',
+      '',                                   // Spouse — set on page 5, show dash here
+      spFather.accompanying || 'no',
+      spMother.accompanying || 'no',
+    ];
 
     y = drawPersonMatrix(page, y, PAGE67_ATTRS, headers, hdrBgs, colData, accompanying, fB, fR);
 

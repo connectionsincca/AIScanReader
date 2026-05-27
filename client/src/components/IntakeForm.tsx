@@ -41,6 +41,7 @@ interface PersonRow {
   maritalStatus: string; dateOfMarriage: string;
   passportInfo: string; address: string;
   nativeLang: string; occupation: string;
+  accompanying: string; // 'yes' | 'no' | ''
 }
 
 const emptyPerson = (): PersonRow => ({
@@ -50,6 +51,7 @@ const emptyPerson = (): PersonRow => ({
   maritalStatus: '', dateOfMarriage: '',
   passportInfo: '', address: '',
   nativeLang: '', occupation: '',
+  accompanying: '',
 });
 
 // ─── Required fields ───────────────────────────────────────────────────────────
@@ -142,6 +144,17 @@ export default function IntakeForm() {
   useEffect(() => { setFormField('ieltsRemarks',   ieltsRemarks);  }, [ieltsRemarks]);  // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { setFormField('celpipRemarks',  celpipRemarks); }, [celpipRemarks]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { setFormField('travelersInfo', JSON.stringify(travelers)); }, [travelers]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Auto-default spouse/child accompanying to 'yes' when declared as travelers ─
+  useEffect(() => {
+    if (travelers.hasSpouse && !formData.spouseAccompanying) setFormField('spouseAccompanying', 'yes');
+  }, [travelers.hasSpouse]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    (['child1Accompanying', 'child2Accompanying', 'child3Accompanying', 'child4Accompanying'] as Array<keyof FormData>).forEach((key, idx) => {
+      if ((idx + 1) <= travelers.childCount && !formData[key]) setFormField(key, 'yes');
+    });
+  }, [travelers.childCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Required keys ───────────────────────────────────────────────────────────
 
@@ -239,6 +252,24 @@ export default function IntakeForm() {
     `w-full bg-transparent text-[11px] outline-none ${
       isErr ? 'border-2 border-red-500 rounded px-0.5' : 'border-b border-gray-300'
     }`;
+
+  /** Accompanying radio: text label ABOVE, radio circle BELOW */
+  const accompanyingRadio = (value: string, onChange: (v: 'yes' | 'no') => void) => (
+    <div className="flex gap-3 items-end justify-center py-0.5">
+      {(['yes', 'no'] as const).map((opt) => (
+        <label key={opt} className="flex flex-col items-center gap-0.5 cursor-pointer select-none">
+          <span className="text-[10px] font-semibold text-gray-700 leading-none">{opt.toUpperCase()}</span>
+          <input
+            type="radio"
+            value={opt}
+            checked={value === opt}
+            onChange={() => onChange(opt)}
+            className="w-3.5 h-3.5 accent-blue-600 mt-0.5"
+          />
+        </label>
+      ))}
+    </div>
+  );
 
   // ── Cell wrappers ───────────────────────────────────────────────────────────
 
@@ -958,6 +989,26 @@ export default function IntakeForm() {
                 ))}
               </tr>
             ))}
+            {/* Accompanying row — no radio under Applicant */}
+            <tr>
+              <td className="border border-gray-400 bg-gray-100 px-1.5 py-1 text-[12px] font-semibold text-gray-700 whitespace-nowrap">
+                Accompanying
+              </td>
+              <td className="border border-gray-400 px-1.5 py-0.5 bg-blue-50 text-center text-gray-400 text-[11px]">—</td>
+              {travelers.hasSpouse && (
+                <td className="border border-gray-400 px-1.5 py-0.5 bg-amber-50">
+                  {accompanyingRadio(formData.spouseAccompanying ?? 'no', (v) => setFormField('spouseAccompanying', v))}
+                </td>
+              )}
+              {Array.from({ length: travelers.childCount }, (_, ci) => {
+                const key = `child${ci + 1}Accompanying` as keyof FormData;
+                return (
+                  <td key={ci} className="border border-gray-400 px-1.5 py-0.5 bg-amber-50">
+                    {accompanyingRadio((formData[key] as string) ?? 'no', (v) => setFormField(key, v))}
+                  </td>
+                );
+              })}
+            </tr>
           </tbody>
         </table>
       </Page>
@@ -1019,6 +1070,22 @@ export default function IntakeForm() {
                 </tr>
               );
             })}
+            {/* Accompanying row — no radio under Applicant */}
+            <tr>
+              <td className="border border-gray-400 bg-gray-100 px-1.5 py-1 text-[12px] font-semibold text-gray-700 whitespace-nowrap">
+                Accompanying
+              </td>
+              <td className="border border-gray-400 px-1.5 py-0.5 bg-blue-50 text-center text-gray-400 text-[11px]">—</td>
+              {[0, 1, 2, 3, 4].map((si) => (
+                <td key={si} className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
+                  {accompanyingRadio(siblingRows[si].accompanying ?? 'no', (v) => {
+                    const updated = [...siblingRows];
+                    updated[si] = { ...updated[si], accompanying: v };
+                    setSiblingRows(updated);
+                  })}
+                </td>
+              ))}
+            </tr>
           </tbody>
         </table>
       </Page>
@@ -1104,6 +1171,35 @@ export default function IntakeForm() {
                 </tr>
               );
             })}
+            {/* Accompanying row — no radio under Applicant or Spouse (spouse covered on page 5) */}
+            <tr>
+              <td className="border border-gray-400 bg-gray-100 px-1.5 py-1 text-[12px] font-semibold text-gray-700 whitespace-nowrap">
+                Accompanying
+              </td>
+              <td className="border border-gray-400 px-1.5 py-0.5 bg-blue-50 text-center text-gray-400 text-[11px]">—</td>
+              {/* Father */}
+              <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
+                {accompanyingRadio(fatherRow.accompanying ?? 'no', (v) => setFatherRow((r) => ({ ...r, accompanying: v })))}
+              </td>
+              {/* Mother */}
+              <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
+                {accompanyingRadio(motherRow.accompanying ?? 'no', (v) => setMotherRow((r) => ({ ...r, accompanying: v })))}
+              </td>
+              {travelers.hasSpouse && (
+                <>
+                  {/* Spouse — already set on Page 5, show read-only here */}
+                  <td className="border border-gray-400 px-1.5 py-0.5 bg-amber-50 text-center text-gray-400 text-[11px]">—</td>
+                  {/* Spouse's Father */}
+                  <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
+                    {accompanyingRadio(spouseFatherRow.accompanying ?? 'no', (v) => setSpouseFatherRow((r) => ({ ...r, accompanying: v })))}
+                  </td>
+                  {/* Spouse's Mother */}
+                  <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
+                    {accompanyingRadio(spouseMotherRow.accompanying ?? 'no', (v) => setSpouseMotherRow((r) => ({ ...r, accompanying: v })))}
+                  </td>
+                </>
+              )}
+            </tr>
           </tbody>
         </table>
 

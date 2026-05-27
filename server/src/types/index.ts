@@ -187,6 +187,13 @@ export interface FormData {
   dateEntryCanada:          string;
   dateRecentEntryCanada:    string;
 
+  // ── Accompanying flags (Pages 5/6/7) ────────────────────────────────────
+  spouseAccompanying:  string;
+  child1Accompanying:  string;
+  child2Accompanying:  string;
+  child3Accompanying:  string;
+  child4Accompanying:  string;
+
   // ── Local state serialised for PDF generation ────────────────────────────
   // Synced via useEffect in IntakeForm so the server can build all 7 pages.
   addressHistory:     string;  // JSON AddrRow[]
