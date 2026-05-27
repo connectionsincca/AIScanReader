@@ -22,7 +22,22 @@ app.set('trust proxy', 1);
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:  ["'self'"],
+      scriptSrc:   ["'self'", "https://challenges.cloudflare.com"],
+      frameSrc:    ["https://challenges.cloudflare.com"],
+      connectSrc:  ["'self'", "https://challenges.cloudflare.com"],
+      imgSrc:      ["'self'", "data:", "https:"],
+      styleSrc:    ["'self'", "https:", "'unsafe-inline'"],
+      fontSrc:     ["'self'", "https:", "data:"],
+      objectSrc:   ["'none'"],
+      baseUri:     ["'self'"],
+      formAction:  ["'self'"],
+    },
+  },
+}));
 app.use(cors({ origin: config.clientUrl, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
