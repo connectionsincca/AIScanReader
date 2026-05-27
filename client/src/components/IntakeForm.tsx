@@ -161,7 +161,10 @@ export default function IntakeForm() {
   const requiredKeys = useMemo<Set<keyof FormData>>(() => {
     const s = new Set<keyof FormData>(BASE_REQUIRED);
     if (travelers.hasSpouse) {
-      (['spouseLastName', 'spouseFirstName', 'spouseDateOfBirth', 'spousePassportNumber'] as Array<keyof FormData>).forEach((k) => s.add(k));
+      (['spouseLastName', 'spouseFirstName', 'spouseDateOfBirth', 'spousePassportNumber',
+        'spouseCountryOfResidence', 'spouseEmailPhone', 'spouseMaritalStatus',
+        'spouseAddress', 'spouseNativeLanguage',
+      ] as Array<keyof FormData>).forEach((k) => s.add(k));
     }
     for (let i = 1; i <= travelers.childCount; i++) {
       ([`child${i}LastName`, `child${i}FirstName`, `child${i}DateOfBirth`, `child${i}PassportNumber`] as Array<keyof FormData>).forEach((k) => s.add(k));
@@ -393,7 +396,7 @@ export default function IntakeForm() {
           if (gapMs > 30 * 24 * 60 * 60 * 1000) {
             rows.push(
               <tr key={`gap-${i}`}>
-                <td colSpan={8} className="border border-dashed border-amber-400 bg-amber-50 text-amber-800 text-center text-[10px] italic py-1">
+                <td colSpan={6} className="border border-dashed border-amber-400 bg-amber-50 text-amber-800 text-center text-[10px] italic py-1">
                   ⚠ Gap detected between {prevEnd} and {curStart}
                 </td>
               </tr>
@@ -424,15 +427,7 @@ export default function IntakeForm() {
               className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
           </td>
           <td className="border border-gray-400 px-1 py-0.5 bg-green-50">
-            <input value={e.salary} onChange={(ev) => updateWorkEntry(i, 'salary', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-green-50">
             <input value={e.cityCountry} onChange={(ev) => updateWorkEntry(i, 'cityCountry', ev.target.value)}
-              className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
-          </td>
-          <td className="border border-gray-400 px-1 py-0.5 bg-green-50">
-            <input value={e.responsibilities} onChange={(ev) => updateWorkEntry(i, 'responsibilities', ev.target.value)}
               className="w-full bg-transparent text-[11px] border-b border-gray-300 outline-none" />
           </td>
         </tr>
@@ -481,14 +476,14 @@ export default function IntakeForm() {
     <span className="text-amber-900 font-medium text-[11px]">{formData.spouseFirstName ?? ''}</span>,
     <span className="text-amber-900 font-medium text-[11px]">{formData.spouseDateOfBirth ?? ''}</span>,
     <span className="text-amber-900 font-medium text-[11px]">{formData.spousePlaceOfBirth ?? ''}</span>,
-    <input value={''} readOnly className="w-full bg-transparent text-[11px] border-b border-gray-300" />,
+    fi('spouseCountryOfResidence'),
     <span className="text-amber-900 font-medium text-[11px]">{formData.spouseCitizenship ?? ''}</span>,
-    <input value={''} readOnly className="w-full bg-transparent text-[11px] border-b border-gray-300" />,
-    <input value={''} readOnly className="w-full bg-transparent text-[11px] border-b border-gray-300" />,
-    <input value={''} readOnly className="w-full bg-transparent text-[11px] border-b border-gray-300" />,
+    fi('spouseEmailPhone'),
+    fi('spouseMaritalStatus'),
+    fi('spouseDateOfMarriage'),
     <span className="text-amber-900 font-medium text-[11px]">{formData.spousePassportNumber ?? ''} / {formData.spousePassportIssuingCountry ?? ''}</span>,
-    <input value={''} readOnly className="w-full bg-transparent text-[11px] border-b border-gray-300" />,
-    <input value={''} readOnly className="w-full bg-transparent text-[11px] border-b border-gray-300" />,
+    fi('spouseAddress'),
+    fi('spouseNativeLanguage'),
     <span className="text-amber-900 font-medium text-[11px]">{formData.spouseCurrentOccupation ?? ''}</span>,
   ] : null;
 
@@ -677,21 +672,33 @@ export default function IntakeForm() {
               <td colSpan={2} className="border border-gray-400 bg-gray-100 font-semibold text-gray-700 px-1.5 py-1 text-[12px]">
                 Have You Applied to IRCC before in past?
               </td>
-              {valTd('bg-slate-50', 2, yn('irccAppliedBefore'))}
+              {valTd('bg-slate-50', 1, yn('irccAppliedBefore'))}
+              {valTd('bg-slate-50', 1, <>
+                <span className="text-[11px] text-gray-500">Provide Details: </span>
+                {fi('irccAppliedDetails')}
+              </>)}
             </tr>
             {/* Row 18 — PNP */}
             <tr>
               <td colSpan={2} className="border border-gray-400 bg-gray-100 font-semibold text-gray-700 px-1.5 py-1 text-[12px]">
                 Have You Applied to any PNP before in past?
               </td>
-              {valTd('bg-slate-50', 2, yn('pnpAppliedBefore'))}
+              {valTd('bg-slate-50', 1, yn('pnpAppliedBefore'))}
+              {valTd('bg-slate-50', 1, <>
+                <span className="text-[11px] text-gray-500">Provide Details: </span>
+                {fi('pnpAppliedDetails')}
+              </>)}
             </tr>
             {/* Row 19 — Relative in Canada */}
             <tr>
               <td colSpan={2} className="border border-gray-400 bg-gray-100 font-semibold text-gray-700 px-1.5 py-1 text-[12px]">
                 Do you have any relative in Canada?
               </td>
-              {valTd('bg-slate-50', 2, yn('hasRelativeInCanada'))}
+              {valTd('bg-slate-50', 1, yn('hasRelativeInCanada'))}
+              {valTd('bg-slate-50', 1, <>
+                <span className="text-[11px] text-gray-500">Provide Details: </span>
+                {fi('relativeInCanadaDetails')}
+              </>)}
             </tr>
             {/* Row 20 — Highest education */}
             <tr>
@@ -826,10 +833,8 @@ export default function IntakeForm() {
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">To</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Name of Employer</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">Job Title / NOC</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">Job Type</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Salary</th>
+              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left whitespace-nowrap">Job Type / hrs/week</th>
               <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">City and Country</th>
-              <th className="border border-gray-400 px-1 py-1 text-[11px] font-semibold text-left">Responsibilities</th>
             </tr>
           </thead>
           <tbody>
@@ -1187,8 +1192,10 @@ export default function IntakeForm() {
               </td>
               {travelers.hasSpouse && (
                 <>
-                  {/* Spouse — already set on Page 5, show read-only here */}
-                  <td className="border border-gray-400 px-1.5 py-0.5 bg-amber-50 text-center text-gray-400 text-[11px]">—</td>
+                  {/* Spouse — editable, mirrors Page 5 value */}
+                  <td className="border border-gray-400 px-1.5 py-0.5 bg-amber-50">
+                    {accompanyingRadio(formData.spouseAccompanying ?? 'yes', (v) => setFormField('spouseAccompanying', v))}
+                  </td>
                   {/* Spouse's Father */}
                   <td className="border border-gray-400 px-1.5 py-0.5 bg-gray-50">
                     {accompanyingRadio(spouseFatherRow.accompanying ?? 'no', (v) => setSpouseFatherRow((r) => ({ ...r, accompanying: v })))}

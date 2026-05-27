@@ -439,11 +439,11 @@ function spouseRow(fd: Partial<FormData>): PersonRow {
   const v = (k: keyof FormData) => (fd[k] ?? '') as string;
   return {
     familyName: v('spouseLastName'), givenNames: v('spouseFirstName'), dob: v('spouseDateOfBirth'),
-    placeOfBirth: v('spousePlaceOfBirth'), countryOfResidence: '',
-    citizenship: v('spouseCitizenship'), emailPhone: '',
-    maritalStatus: '', dateOfMarriage: '',
+    placeOfBirth: v('spousePlaceOfBirth'), countryOfResidence: v('spouseCountryOfResidence'),
+    citizenship: v('spouseCitizenship'), emailPhone: v('spouseEmailPhone'),
+    maritalStatus: v('spouseMaritalStatus'), dateOfMarriage: v('spouseDateOfMarriage'),
     passportInfo: `${v('spousePassportNumber')}${v('spousePassportIssuingCountry') ? ' / ' + v('spousePassportIssuingCountry') : ''}`,
-    address: '', nativeLang: '', occupation: v('spouseCurrentOccupation'),
+    address: v('spouseAddress'), nativeLang: v('spouseNativeLanguage'), occupation: v('spouseCurrentOccupation'),
     accompanying: v('spouseAccompanying') || 'no',
   };
 }
@@ -612,10 +612,10 @@ export async function generateFormPdf(
     y -= rowWide(page, y, 'Date First Entered Canada and Port of Entry', [v('dateFirstEnteredCanada'), v('portOfEntry')].filter(Boolean).join(' — '), ROW, fB, fR, 320);
 
     // Yes/No rows with checkboxes
-    y -= rowYN(page, y, 'Have you ever been Deported/ Refused Visa/ refused entry to any country', v('deportedFlag'), v('deportedDetails'), true,  YNH, fB, fR);
-    y -= rowYN(page, y, 'Have You Applied to IRCC before in past?',       v('irccAppliedBefore'), '', false, YNH, fB, fR);
-    y -= rowYN(page, y, 'Have You Applied to any PNP before in past?',    v('pnpAppliedBefore'),  '', false, YNH, fB, fR);
-    y -= rowYN(page, y, 'Do you have any relative in Canada?',            v('hasRelativeInCanada'), '', false, YNH, fB, fR);
+    y -= rowYN(page, y, 'Have you ever been Deported/ Refused Visa/ refused entry to any country', v('deportedFlag'),        v('deportedDetails'),         true, YNH, fB, fR);
+    y -= rowYN(page, y, 'Have You Applied to IRCC before in past?',                                v('irccAppliedBefore'),   v('irccAppliedDetails'),       true, YNH, fB, fR);
+    y -= rowYN(page, y, 'Have You Applied to any PNP before in past?',                             v('pnpAppliedBefore'),    v('pnpAppliedDetails'),        true, YNH, fB, fR);
+    y -= rowYN(page, y, 'Do you have any relative in Canada?',                                     v('hasRelativeInCanada'), v('relativeInCanadaDetails'),   true, YNH, fB, fR);
     y -= rowWideAuto(page, y, 'Highest education completed (Canadian Equivalency)', v('highestEducationCanadian'), fB, fR, 320);
     y -= rowWideAuto(page, y, 'Total Number of years of education including primary, secondary and post-secondary education.', v('totalYearsEducation'), fB, fR, 320);
 
@@ -709,7 +709,7 @@ export async function generateFormPdf(
       'When you became qualified for this job',
     ], WW, fB);
 
-    const minWork = 7;
+    const minWork = 12;
     const workRows = [...workList];
     while (workRows.length < minWork) workRows.push({ employer:'', jobTitle:'', jobType:'', salary:'', startDate:'', endDate:'', cityCountry:'', responsibilities:'' });
     for (const e of workRows) {

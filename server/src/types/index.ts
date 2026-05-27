@@ -104,6 +104,14 @@ export interface FormData {
   spousePassportExpiry:         string;
   spousePassportIssuingCountry: string;
 
+  // ── SPOUSE MANUAL ENTRY FIELDS (Pages 5 & 7) ────────────────────────────
+  spouseCountryOfResidence: string;
+  spouseEmailPhone:         string;
+  spouseMaritalStatus:      string;
+  spouseDateOfMarriage:     string;
+  spouseAddress:            string;
+  spouseNativeLanguage:     string;
+
   // ── From SPOUSE WORK EXPERIENCE CERTS (optional) ────────────────────────
   spouseWorkHistory:       string;  // JSON array
   spouseCurrentOccupation: string;
@@ -178,8 +186,11 @@ export interface FormData {
   deportedFlag:             string;  // 'yes' | 'no'
   deportedDetails:          string;
   irccAppliedBefore:        string;  // 'yes' | 'no'
+  irccAppliedDetails:       string;
   pnpAppliedBefore:         string;  // 'yes' | 'no'
+  pnpAppliedDetails:        string;
   hasRelativeInCanada:      string;  // 'yes' | 'no'
+  relativeInCanadaDetails:  string;
   highestEducationCanadian: string;
   totalYearsEducation:      string;
 
