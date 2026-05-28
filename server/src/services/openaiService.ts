@@ -50,18 +50,20 @@ const DOC_LABELS: Record<DocumentId, string> = {
 
 // ─── Per-type visual characteristics injected into the validation prompt ────
 
-const PASSPORT_TRAITS = `A passport is a BOOKLET — multiple pages bound together like a small book, NOT a flat card.
-Required visual markers (at least 2 must be clearly visible):
-• The word "PASSPORT" on the cover or data page
-• A biographical data page with holder's photo and personal details in printed fields
-• A Machine Readable Zone (MRZ): two lines of monospaced alphanumeric characters at the bottom of the data page (e.g. "P<IND..." or "P<GBR...")
-• An embossed country seal or national emblem on the cover
-• Lamination or holographic overlay on the data page
+const PASSPORT_TRAITS = `A passport document — accept ANY format that contains passport biographical data.
+This includes: a physical passport booklet, a flat scan of a passport, a photocopy, a photograph of a passport page, or an image of a passport embedded in another document (e.g. a Word or PDF file containing a scanned passport image). The physical form does NOT matter — only the content matters.
 
-IMPORTANT — the following documents are NOT passports and must be rejected:
-- Driver's licence or national ID card (flat plastic card, credit-card size)
-- Visa sticker alone (affixed to a passport page but not the passport itself)
-- Any flat A4/letter paper document`;
+Required: at least 2 of the following must be clearly visible:
+• A Machine Readable Zone (MRZ) — two lines of monospaced characters at the bottom, where the first line starts with "P<" followed by a country code (e.g. "P<IND", "P<GBR", "P<CAN"). The "P" indicates this is a passport, not an ID card
+• The word "PASSPORT" or "PASSEPORT" anywhere on the page
+• Biographical fields typical of a passport data page: surname, given name(s), nationality, date of birth, sex, place of birth, date of issue, date of expiry, passport number
+• A passport-style photograph of the holder alongside the biographical data
+• A country name and national emblem consistent with a travel document
+
+REJECT only if the image clearly shows a completely different document type:
+- Driver's licence or Aadhar / national ID card that has NO MRZ starting with "P<"
+- Visa sticker alone with no accompanying passport data page
+- A blank page or unrelated document with no passport data whatsoever`;
 
 const DOC_VISUAL_TRAITS: Record<DocumentId, string> = {
 
